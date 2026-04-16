@@ -56,17 +56,12 @@
         }
         .hour-btn{
             width:calc((100% - 20px) / 6);padding:6px 0;border:none;border-radius:8px;
-            background:#fff;font-size:.72rem;font-weight:500;color:#3a3a3c;
+            background:#fff;font-size:.72rem;font-weight:600;color:#1d1d1f;
             font-family:inherit;cursor:pointer;transition:all .12s;text-align:center;
         }
         .hour-btn:active{transform:scale(.95);}
-        .hour-btn .h-time{display:block;font-weight:600;font-size:.75rem;}
-        .hour-btn .h-cnt{display:block;font-size:.6rem;color:#aeaeb2;margin-top:1px;}
-        .hour-btn.has-data{color:#1d1d1f;}
-        .hour-btn.has-data .h-cnt{color:#0071e3;}
-        .hour-btn.no-data{opacity:.4;}
+        .hour-btn.disabled{opacity:.25;cursor:default;pointer-events:none;}
         .hour-btn.active{background:#0071e3;color:#fff;}
-        .hour-btn.active .h-cnt{color:rgba(255,255,255,.7);}
         .hour-btn-all{
             width:100%;padding:6px 0;border:none;border-radius:8px;
             background:#f0f0f2;font-size:.72rem;font-weight:600;color:#8e8e93;
@@ -183,7 +178,7 @@
 <script>
 const API_BASE = 'https://store-api.sikdae.com/v1/store/coupon';
 const PAGE_ROW = 100;
-let currentPage = 1, totalCount = 0, currentDate = '', allSales = [], selectedHour = -1;
+let currentPage = 1, totalCount = 0, currentDate = '', allSales = [], selectedHours = new Set();
 
 function getConfig() {
     return { token: localStorage.getItem('sv_token')||'', storeId: localStorage.getItem('sv_store_id')||'' };
@@ -240,7 +235,7 @@ function renderSummary() {
     document.getElementById('sumCancel').textContent=formatNum(canceled)+'건';
 }
 
-// ── Hour Buttons ──
+// ── Hour Buttons (multi-select) ──
 function renderHourButtons() {
     const hours=Array(24).fill(0);
     allSales.forEach(s=>{if(s.useDate){hours[new Date(s.useDate*1000).getHours()]++;}});
@@ -248,19 +243,19 @@ function renderHourButtons() {
     const grid=document.getElementById('hourGrid');
     grid.innerHTML='';
     hours.forEach((cnt,h)=>{
-        const cls=selectedHour===h?'active':cnt>0?'has-data':'no-data';
-        grid.innerHTML+=`<button class="hour-btn ${cls}" onclick="toggleHourFilter(${h})"><span class="h-time">${h}시</span><span class="h-cnt">${cnt}건</span></button>`;
+        const isActive=selectedHours.has(h);
+        const cls=isActive?'active':cnt===0?'disabled':'';
+        grid.innerHTML+=`<button class="hour-btn ${cls}" onclick="toggleHourFilter(${h})">${h}시[${cnt}]</button>`;
     });
-    const allBtn=document.getElementById('hourAllBtn');
-    allBtn.className='hour-btn-all'+(selectedHour<0?' active':'');
+    document.getElementById('hourAllBtn').className='hour-btn-all'+(selectedHours.size===0?' active':'');
 }
 
 function toggleHourFilter(h) {
-    selectedHour=selectedHour===h?-1:h;
+    if(selectedHours.has(h)) selectedHours.delete(h); else selectedHours.add(h);
     renderHourButtons(); applyFilters();
 }
 
-function clearHourFilter() { selectedHour=-1; renderHourButtons(); applyFilters(); }
+function clearHourFilter() { selectedHours.clear(); renderHourButtons(); applyFilters(); }
 
 // ── List ──
 function renderList(sales) {
@@ -284,7 +279,7 @@ function renderList(sales) {
             <div class="sale-bottom">
                 ${statusTag}${typeTag}
                 <span class="sale-meta">${formatTime(s.useDate)}</span>
-                <span class="sale-payroom">#${s.payRoomIdx||'-'}</span>
+                <span class="sale-payroom">${s.payRoomIdx||'-'}</span>
             </div>`;
         container.appendChild(card);
     });
@@ -301,7 +296,7 @@ function applyFilters() {
         const text=card.textContent.toLowerCase();
         const hour=parseInt(card.dataset.hour,10);
         const matchSearch=!q||payRoom.includes(q)||leader.includes(q)||text.includes(q);
-        const matchHour=selectedHour<0||hour===selectedHour;
+        const matchHour=selectedHours.size===0||selectedHours.has(hour);
         card.style.display=(matchSearch&&matchHour)?'':'none';
     });
 }
@@ -321,7 +316,7 @@ async function openDetail(couponId) {
         const statusText=c.paymentStatus==='USED'?'사용완료':c.paymentStatus==='CANCELED'?'취소':c.paymentStatus;
         let html=`
             <div class="sheet-title">${c.leaderName||'-'}</div>
-            <div class="sheet-sub">${c.comName||''} · #${c.payRoomIdx||'-'}</div>
+            <div class="sheet-sub">${c.comName||''} · ${c.payRoomIdx||'-'}</div>
             <div class="sheet-row"><span class="sheet-label">결제번호</span><span class="sheet-val">${c.payRoomIdx||'-'}</span></div>
             <div class="sheet-row"><span class="sheet-label">쿠폰ID</span><span class="sheet-val" style="font-size:.7rem;">${c.couponId}</span></div>
             <div class="sheet-row"><span class="sheet-label">상태</span><span class="sheet-val">${statusText}</span></div>

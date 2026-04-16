@@ -54,9 +54,8 @@
         .hour-btn-web .h-cnt{font-size:.6rem;color:#aeaeb2;}
         .hour-btn-web.has-data{color:#1d1d1f;border-color:#d1d1d6;}
         .hour-btn-web.has-data .h-cnt{color:#0071e3;}
-        .hour-btn-web.no-data{opacity:.35;}
+        .hour-btn-web.disabled{opacity:.25;cursor:default;pointer-events:none;}
         .hour-btn-web.active{background:#0071e3;color:#fff;border-color:#0071e3;}
-        .hour-btn-web.active .h-cnt{color:rgba(255,255,255,.7);}
         .hour-all-web{
             width:100%;padding:3px 0;border:1px solid #e5e5e7;border-radius:5px;
             background:#f9fafb;font-size:.68rem;font-weight:600;color:#8e8e93;
@@ -185,7 +184,7 @@
 <script>
 const API_BASE = 'https://store-api.sikdae.com/v1/store/coupon';
 const PAGE_ROW = 100;
-let currentPage=1, totalCount=0, allSales=[], selectedHour=-1;
+let currentPage=1, totalCount=0, allSales=[], selectedHours=new Set();
 
 function getConfig(){ return {token:localStorage.getItem('sv_token')||'',storeId:localStorage.getItem('sv_store_id')||''}; }
 function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
@@ -233,16 +232,18 @@ function renderHourButtons() {
     document.getElementById('chartCount').textContent=allSales.length;
     const grid=document.getElementById('hourGrid'); grid.innerHTML='';
     hours.forEach((cnt,h)=>{
-        const cls=selectedHour===h?'active':cnt>0?'has-data':'no-data';
-        grid.innerHTML+=`<button class="hour-btn-web ${cls}" onclick="toggleHourFilter(${h})">${h}시 <span class="h-cnt">${cnt}</span></button>`;
+        const isActive=selectedHours.has(h);
+        const cls=isActive?'active':cnt===0?'disabled':'';
+        grid.innerHTML+=`<button class="hour-btn-web ${cls}" onclick="toggleHourFilter(${h})">${h}시[${cnt}]</button>`;
     });
-    document.getElementById('hourAllBtn').className='hour-all-web'+(selectedHour<0?' active':'');
+    document.getElementById('hourAllBtn').className='hour-all-web'+(selectedHours.size===0?' active':'');
 }
 
 function toggleHourFilter(h) {
-    selectedHour=selectedHour===h?-1:h; renderHourButtons(); applyFilters();
+    if(selectedHours.has(h)) selectedHours.delete(h); else selectedHours.add(h);
+    renderHourButtons(); applyFilters();
 }
-function clearHourFilter(){ selectedHour=-1; renderHourButtons(); applyFilters(); }
+function clearHourFilter(){ selectedHours.clear(); renderHourButtons(); applyFilters(); }
 
 function renderTable() {
     const tbody=document.getElementById('tbody'); tbody.innerHTML='';
@@ -258,7 +259,7 @@ function renderTable() {
         tr.onclick=()=>openDetail(s.couponId);
         tr.innerHTML=`
             <td class="text-center sub-text">${seq}</td>
-            <td><span class="payroom-link">#${s.payRoomIdx||'-'}</span></td>
+            <td><span class="payroom-link">${s.payRoomIdx||'-'}</span></td>
             <td><div class="leader-name">${s.leaderName||'-'}</div><div class="sub-text">${s.comName||''}</div></td>
             <td><div class="menu-name" title="${s.menuName||''}">${s.menuName||'-'}</div></td>
             <td class="text-center">${s.member||1}</td>
@@ -279,7 +280,7 @@ function applyFilters() {
         const text=tr.textContent.toLowerCase();
         const hour=parseInt(tr.dataset.hour,10);
         const matchSearch=!q||payRoom.includes(q)||leader.includes(q)||text.includes(q);
-        const matchHour=selectedHour<0||hour===selectedHour;
+        const matchHour=selectedHours.size===0||selectedHours.has(hour);
         tr.style.display=(matchSearch&&matchHour)?'':'none';
     });
 }
@@ -306,7 +307,7 @@ async function openDetail(couponId) {
         if(data.status&&data.status<0)throw new Error(data.message);
         const c=data.coupon, menus=data.menus||[];
         const statusText=c.paymentStatus==='USED'?'사용완료':c.paymentStatus==='CANCELED'?'취소':c.paymentStatus;
-        document.getElementById('modalTitle').textContent=`${c.leaderName||'-'} · #${c.payRoomIdx||'-'}`;
+        document.getElementById('modalTitle').textContent=`${c.leaderName||'-'} · ${c.payRoomIdx||'-'}`;
         let html=`<div class="detail-grid">
             <div class="detail-row"><span class="detail-label">결제번호</span><span class="detail-val">${c.payRoomIdx||'-'}</span></div>
             <div class="detail-row"><span class="detail-label">쿠폰 ID</span><span class="detail-val" style="font-size:.75rem;">${c.couponId}</span></div>
