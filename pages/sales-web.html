@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>매출현황</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
@@ -27,6 +28,9 @@
         .search-input-web::placeholder{color:#c7c7cc;}
         .search-btn{padding:6px 18px;border:none;border-radius:6px;background:#0071e3;color:#fff;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;}
         .search-btn:hover{background:#0077ed;}
+        .excel-btn{padding:6px 14px;border:1px solid #2e7d32;border-radius:6px;background:#fff;color:#2e7d32;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:4px;}
+        .excel-btn:hover{background:#e8f5e9;}
+        .excel-btn:disabled{opacity:.5;cursor:default;}
 
         /* ── Summary + Chart Row ── */
         .stats-row{display:flex;gap:12px;padding:16px 32px;}
@@ -114,6 +118,7 @@
             <button class="date-arrow" onclick="shiftDate(1)">&rarr;</button>
         </div>
         <button class="search-btn" onclick="fetchData(1)">조회</button>
+        <button class="excel-btn" id="excelBtn" onclick="downloadExcel()" disabled>Excel</button>
     </div>
 </div>
 
@@ -206,6 +211,7 @@ async function fetchData(page) {
         document.getElementById('statsRow').style.display='flex';
         document.getElementById('statusArea').style.display='none';
         document.getElementById('tableArea').style.display='block';
+        document.getElementById('excelBtn').disabled=false;
     } catch(e){showMsg(`조회 실패: ${e.message}`,true);}
 }
 
@@ -326,6 +332,62 @@ async function openDetail(couponId) {
 
 function closeModal(e) { if(e&&e.target!==e.currentTarget)return; document.getElementById('modalOverlay').classList.remove('show'); }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// ── Excel Download (all pages) ──
+async function downloadExcel() {
+    const {token,storeId}=getConfig();
+    const date=document.getElementById('dateInput').value;
+    if(!token||!storeId||!date) return;
+
+    const btn=document.getElementById('excelBtn');
+    const origText=btn.textContent;
+    btn.disabled=true;
+
+    let all=[], page=1, total=1;
+    try {
+        while((page-1)*PAGE_ROW < total) {
+            btn.textContent=`수집중... (${all.length})`;
+            const url=`${API_BASE}/group?sid=${storeId}&date=${date}&page=${page}&pageRow=${PAGE_ROW}`;
+            const res=await fetch(url,{headers:getAuthHeader()});
+            if(!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data=await res.json();
+            if(data.status&&data.status<0) throw new Error(data.message);
+            total=data.totalCount||0;
+            all=all.concat(data.sales||[]);
+            page++;
+        }
+
+        btn.textContent=`생성중... (${all.length}건)`;
+
+        const rows=[['#','결제번호','쿠폰ID','주문자','고객사','메뉴','인원','결제금액','유형','상태','시간']];
+        all.forEach((s,i)=>{
+            rows.push([
+                i+1,
+                s.payRoomIdx||'',
+                s.couponId||'',
+                s.leaderName||'',
+                s.comName||'',
+                s.menuName||'',
+                s.member||1,
+                s.supplyPrice||0,
+                s.couponType==='SINGLE'?'단체':'그룹',
+                s.isCanceled?'취소':'완료',
+                formatTime(s.useDate)
+            ]);
+        });
+
+        const ws=XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols']=[{wch:5},{wch:12},{wch:38},{wch:8},{wch:14},{wch:40},{wch:6},{wch:10},{wch:6},{wch:6},{wch:10}];
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,ws,'매출현황');
+        XLSX.writeFile(wb,`매출현황_${date}_${all.length}건.xlsx`);
+    } catch(e) {
+        alert('엑셀 다운로드 실패: '+e.message);
+    } finally {
+        btn.textContent=origText;
+        btn.disabled=false;
+    }
+}
 
 function showMsg(html,isErr) {
     document.getElementById('statusArea').style.display='block';
