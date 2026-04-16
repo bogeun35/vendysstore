@@ -13,345 +13,352 @@
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;color:#1d1d1f;-webkit-font-smoothing:antialiased;}
 
-        /* ── App Header ── */
-        .app-header{
-            position:sticky;top:0;z-index:10;
-            background:#fff;
-            padding:0 16px;
-        }
-        .header-top{
-            height:44px;display:flex;align-items:center;justify-content:center;
-        }
+        /* ── Header ── */
+        .app-header{position:sticky;top:0;z-index:10;background:#fff;padding:0 16px;}
+        .header-top{height:44px;display:flex;align-items:center;justify-content:center;}
         .header-title{font-size:.95rem;font-weight:700;}
 
         /* ── Date Nav ── */
-        .date-nav{
-            display:flex;align-items:center;justify-content:center;
-            gap:6px;padding:8px 0 12px;
-            border-bottom:1px solid #f0f0f2;
-        }
+        .date-nav{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 0 10px;}
         .date-arrow{
-            width:32px;height:32px;border:none;border-radius:50%;
-            background:#f0f0f2;font-size:.9rem;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;
+            width:32px;height:32px;border:none;border-radius:50%;background:#f0f0f2;
+            font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
             transition:background .12s;color:#1d1d1f;font-family:inherit;
         }
-        .date-arrow:hover{background:#e5e5e7;}
         .date-arrow:active{background:#d1d1d6;}
-        .date-display{
-            font-size:.88rem;font-weight:600;min-width:120px;text-align:center;
-            cursor:pointer;padding:6px 12px;border-radius:8px;
-            transition:background .12s;
-        }
+        .date-display{font-size:.88rem;font-weight:600;min-width:120px;text-align:center;cursor:pointer;padding:6px 12px;border-radius:8px;}
         .date-display:hover{background:#f0f0f2;}
         .date-hidden{position:absolute;opacity:0;width:0;height:0;overflow:hidden;}
 
+        /* ── Search ── */
+        .search-bar{padding:0 0 10px;border-bottom:1px solid #f0f0f2;}
+        .search-input{
+            width:100%;padding:8px 12px;border:1.5px solid #e5e5e7;border-radius:8px;
+            font-size:.82rem;font-family:inherit;background:#fafafa;
+        }
+        .search-input:focus{outline:none;border-color:#0071e3;background:#fff;}
+        .search-input::placeholder{color:#c7c7cc;}
+
         /* ── Summary ── */
-        .summary{
-            display:grid;grid-template-columns:1fr 1fr;gap:8px;
-            padding:14px 16px;
-        }
-        .sum-card{
-            background:#fff;border-radius:12px;padding:12px 14px;
-        }
+        .summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px;}
+        .sum-card{background:#fff;border-radius:12px;padding:12px 14px;}
         .sum-card .label{font-size:.68rem;color:#8e8e93;font-weight:500;margin-bottom:2px;}
-        .sum-card .val{font-size:1.15rem;font-weight:700;}
-        .sum-card .val.c-blue{color:#0071e3;}
-        .sum-card .val.c-green{color:#34c759;}
-        .sum-card .val.c-red{color:#ff3b30;}
+        .sum-card .val{font-size:1.1rem;font-weight:700;}
+        .sum-card .val.c-blue{color:#0071e3;}.sum-card .val.c-green{color:#34c759;}.sum-card .val.c-red{color:#ff3b30;}
         .sum-card.wide{grid-column:span 2;display:flex;align-items:center;justify-content:space-between;}
-        .sum-card.wide .val{font-size:1.25rem;}
+        .sum-card.wide .val{font-size:1.2rem;}
+
+        /* ── Chart ── */
+        .chart-section{padding:0 16px 12px;}
+        .chart-title{font-size:.72rem;font-weight:600;color:#8e8e93;margin-bottom:6px;}
+        .chart-wrap{background:#fff;border-radius:12px;padding:14px;height:130px;position:relative;}
+        .chart-bars{display:flex;align-items:flex-end;gap:2px;height:90px;}
+        .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
+        .chart-bar-wrap:hover .chart-bar{opacity:.7;}
+        .chart-bar-wrap.active .chart-bar{background:#ff9500!important;}
+        .chart-bar-wrap.active .chart-label{color:#ff9500;font-weight:600;}
+        .chart-bar{width:100%;border-radius:3px 3px 0 0;background:#0071e3;min-height:1px;transition:height .3s;}
+        .chart-bar.zero{background:#e5e5e7;}
+        .chart-label{font-size:.55rem;color:#aeaeb2;}
+        .chart-val{font-size:.5rem;color:#8e8e93;font-weight:500;}
+        .hour-filter-tag{
+            display:none;align-items:center;gap:4px;margin:6px 16px 0;
+            font-size:.72rem;color:#ff9500;font-weight:600;
+        }
+        .hour-filter-tag.show{display:flex;}
+        .hour-filter-clear{
+            border:none;background:#ff9500;color:#fff;font-size:.6rem;font-weight:600;
+            padding:2px 6px;border-radius:8px;cursor:pointer;font-family:inherit;
+        }
 
         /* ── List ── */
         .list-section{padding:0 16px 100px;}
-        .list-header{
-            display:flex;align-items:center;justify-content:space-between;
-            padding:10px 0 8px;
-        }
+        .list-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0;}
         .list-count{font-size:.75rem;color:#8e8e93;font-weight:500;}
-        .list-page-info{font-size:.7rem;color:#aeaeb2;}
 
         .sale-card{
-            background:#fff;border-radius:12px;padding:14px 16px;
-            margin-bottom:8px;
-            transition:transform .1s;
+            background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:8px;
+            cursor:pointer;transition:transform .1s;
         }
         .sale-card:active{transform:scale(.98);}
-        .sale-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
+        .sale-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;}
         .sale-leader{font-size:.88rem;font-weight:600;}
         .sale-company{font-size:.72rem;color:#8e8e93;margin-top:1px;}
         .sale-price{font-size:.95rem;font-weight:700;text-align:right;}
         .sale-price-label{font-size:.65rem;color:#8e8e93;text-align:right;}
-        .sale-menu{
-            font-size:.78rem;color:#3a3a3c;
-            margin-bottom:8px;
-            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-        }
+        .sale-menu{font-size:.78rem;color:#3a3a3c;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
         .sale-bottom{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-        .sale-tag{
-            font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;
-        }
-        .t-done{background:#e8f5e9;color:#2e7d32;}
-        .t-cancel{background:#fce4ec;color:#c62828;}
-        .t-single{background:#e3f2fd;color:#1565c0;}
-        .t-group{background:#f3e5f5;color:#7b1fa2;}
+        .sale-tag{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;}
+        .t-done{background:#e8f5e9;color:#2e7d32;}.t-cancel{background:#fce4ec;color:#c62828;}
+        .t-single{background:#e3f2fd;color:#1565c0;}.t-group{background:#f3e5f5;color:#7b1fa2;}
         .sale-meta{font-size:.68rem;color:#aeaeb2;}
-        .sale-store{font-size:.68rem;color:#aeaeb2;margin-left:auto;}
+        .sale-payroom{font-size:.68rem;color:#0071e3;font-weight:500;margin-left:auto;}
 
-        /* ── Load More ── */
         .load-more{
-            display:block;width:100%;padding:14px;margin:8px 0;
-            border:none;border-radius:12px;background:#fff;
-            font-size:.82rem;font-weight:600;color:#0071e3;
-            font-family:inherit;cursor:pointer;transition:background .12s;
+            display:block;width:100%;padding:14px;margin:8px 0;border:none;border-radius:12px;
+            background:#fff;font-size:.82rem;font-weight:600;color:#0071e3;
+            font-family:inherit;cursor:pointer;
         }
-        .load-more:hover{background:#f0f0f2;}
 
-        /* ── States ── */
-        .state-msg{
-            text-align:center;padding:60px 20px;color:#8e8e93;font-size:.85rem;
+        /* ── Detail Sheet ── */
+        .sheet-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;
+            display:none;align-items:flex-end;justify-content:center;
         }
+        .sheet-overlay.show{display:flex;}
+        .sheet{
+            background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:375px;
+            max-height:85vh;overflow-y:auto;padding:20px 20px 32px;
+            animation:slideUp .25s ease-out;
+        }
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        .sheet-handle{width:36px;height:4px;border-radius:2px;background:#d1d1d6;margin:0 auto 16px;}
+        .sheet-title{font-size:1rem;font-weight:700;margin-bottom:4px;}
+        .sheet-sub{font-size:.75rem;color:#8e8e93;margin-bottom:16px;}
+        .sheet-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f0f2;}
+        .sheet-row:last-child{border-bottom:none;}
+        .sheet-label{font-size:.78rem;color:#8e8e93;}
+        .sheet-val{font-size:.78rem;font-weight:600;text-align:right;max-width:60%;word-break:break-all;}
+        .sheet-section{font-size:.72rem;font-weight:600;color:#0071e3;margin:16px 0 8px;padding-top:8px;border-top:1px solid #e5e5e7;}
+        .menu-item-row{padding:8px 0;border-bottom:1px solid #f5f5f7;}
+        .menu-item-name{font-size:.82rem;font-weight:500;margin-bottom:2px;}
+        .menu-item-price{font-size:.75rem;color:#8e8e93;}
+
+        .state-msg{text-align:center;padding:60px 20px;color:#8e8e93;font-size:.85rem;}
         .state-msg.error{color:#ff3b30;}
-        .spinner{
-            width:28px;height:28px;border:3px solid #e5e5e7;border-top-color:#0071e3;
-            border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px;
-        }
+        .spinner{width:28px;height:28px;border:3px solid #e5e5e7;border-top-color:#0071e3;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px;}
         @keyframes spin{to{transform:rotate(360deg)}}
-
-        /* ── Desktop (>600px) ── */
-        @media(min-width:600px){
-            .summary{grid-template-columns:repeat(4,1fr);}
-            .sum-card.wide{grid-column:span 1;}
-            .list-section{max-width:800px;margin:0 auto;}
-            .sale-card{padding:16px 20px;}
-        }
     </style>
 </head>
 <body>
 
-<!-- ── Header ── -->
 <div class="app-header">
-    <div class="header-top">
-        <div class="header-title">매출현황</div>
-    </div>
+    <div class="header-top"><div class="header-title">매출현황</div></div>
     <div class="date-nav">
         <button class="date-arrow" onclick="shiftDate(-1)">&larr;</button>
         <div class="date-display" id="dateDisplay" onclick="openDatePicker()"></div>
         <button class="date-arrow" onclick="shiftDate(1)">&rarr;</button>
         <input type="date" class="date-hidden" id="dateInput" onchange="onDateChange()">
     </div>
+    <div class="search-bar">
+        <input type="text" class="search-input" id="searchInput" placeholder="결제번호 또는 이름으로 검색..." oninput="filterList()">
+    </div>
 </div>
 
-<!-- ── Summary ── -->
 <div class="summary" id="summaryArea" style="display:none;">
     <div class="sum-card wide">
-        <div><div class="label">총 공급가</div><div class="val" id="sumSupply">0</div></div>
+        <div><div class="label">총 결제금액</div><div class="val" id="sumSupply">0</div></div>
         <div><div class="label">건수</div><div class="val c-blue" id="sumTotal">0</div></div>
     </div>
-    <div class="sum-card">
-        <div class="label">사용완료</div>
-        <div class="val c-green" id="sumUsed">0</div>
-    </div>
-    <div class="sum-card">
-        <div class="label">취소</div>
-        <div class="val c-red" id="sumCancel">0</div>
-    </div>
+    <div class="sum-card"><div class="label">사용완료</div><div class="val c-green" id="sumUsed">0</div></div>
+    <div class="sum-card"><div class="label">취소</div><div class="val c-red" id="sumCancel">0</div></div>
 </div>
 
-<!-- ── List ── -->
+<div class="chart-section" id="chartSection" style="display:none;">
+    <div class="chart-title">시간별 결제 현황 [<span id="chartCount">0</span>] (탭하여 필터)</div>
+    <div class="chart-wrap"><div class="chart-bars" id="chartBars"></div></div>
+</div>
+<div class="hour-filter-tag" id="hourFilterTag">
+    <span id="hourFilterText"></span>
+    <button class="hour-filter-clear" onclick="clearHourFilter()">해제</button>
+</div>
+
 <div class="list-section">
-    <div id="statusArea">
-        <div class="state-msg">날짜를 선택하면 자동 조회됩니다.</div>
-    </div>
+    <div id="statusArea"><div class="state-msg">날짜를 선택하면 자동 조회됩니다.</div></div>
     <div id="listArea" style="display:none;">
-        <div class="list-header">
-            <span class="list-count" id="listCount"></span>
-            <span class="list-page-info" id="listPageInfo"></span>
-        </div>
+        <div class="list-header"><span class="list-count" id="listCount"></span></div>
         <div id="listContainer"></div>
         <button class="load-more" id="loadMoreBtn" onclick="loadMore()" style="display:none;">더보기</button>
     </div>
 </div>
 
+<!-- Detail Sheet -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet(event)">
+    <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-handle"></div>
+        <div id="sheetContent"><div class="state-msg"><div class="spinner"></div></div></div>
+    </div>
+</div>
+
 <script>
-    const API_BASE = 'https://store-api.sikdae.com/v1/store/coupon/group';
-    const PAGE_ROW = 100;
-    let currentPage = 1;
-    let totalCount = 0;
-    let currentDate = '';
+const API_BASE = 'https://store-api.sikdae.com/v1/store/coupon';
+const PAGE_ROW = 100;
+let currentPage = 1, totalCount = 0, currentDate = '', allSales = [], selectedHour = -1;
 
-    function getConfig() {
-        return {
-            token: localStorage.getItem('sv_token') || '',
-            storeId: localStorage.getItem('sv_store_id') || ''
-        };
-    }
+function getConfig() {
+    return { token: localStorage.getItem('sv_token')||'', storeId: localStorage.getItem('sv_store_id')||'' };
+}
 
-    // ── Date Helpers ──
-    function toDateStr(d) {
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
+function toDateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function formatDisplay(ds) {
+    const [y,m,d]=ds.split('-'); const days=['일','월','화','수','목','금','토'];
+    return `${+m}월 ${+d}일 (${days[new Date(+y,+m-1,+d).getDay()]})`;
+}
+function shiftDate(o) { const [y,m,d]=currentDate.split('-').map(Number); const dt=new Date(y,m-1,d+o); currentDate=toDateStr(dt); updateDateUI(); clearHourFilter(); fetchData(1); }
+function openDatePicker() { const i=document.getElementById('dateInput'); i.value=currentDate; i.showPicker(); }
+function onDateChange() { currentDate=document.getElementById('dateInput').value; updateDateUI(); fetchData(1); }
+function updateDateUI() { document.getElementById('dateDisplay').textContent=formatDisplay(currentDate); }
+function formatTime(ts) { if(!ts)return''; const d=new Date(ts*1000); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`; }
+function formatNum(n) { return (n||0).toLocaleString('ko-KR'); }
+function getAuthHeader() { const {token,storeId}=getConfig(); return { 'Authorization': token.startsWith('Bearer ')?token:`Bearer ${token}`, 'x-store-gsid':storeId, 'x-user-agent':'Vendys/1.0 {"client":"SikdaeUser","os":"web","JsVersion":"2.63.0"}', 'Accept':'application/json' }; }
 
-    function formatDisplay(dateStr) {
-        const [y, m, d] = dateStr.split('-');
-        const days = ['일','월','화','수','목','금','토'];
-        const dt = new Date(+y, +m-1, +d);
-        return `${+m}월 ${+d}일 (${days[dt.getDay()]})`;
-    }
+// ── Fetch ──
+async function fetchData(page) {
+    const {token,storeId}=getConfig();
+    if(!token||!storeId){showMsg('Token / Store ID를 설정해주세요.',true);return;}
+    currentPage=page||1;
+    if(currentPage===1){document.getElementById('listContainer').innerHTML='';allSales=[];}
+    showMsg('<div class="spinner"></div>불러오는 중...');
+    try {
+        const url=`${API_BASE}/group?sid=${storeId}&date=${currentDate}&page=${currentPage}&pageRow=${PAGE_ROW}`;
+        const res=await fetch(url,{headers:getAuthHeader()});
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        const data=await res.json();
+        if(data.status&&data.status<0)throw new Error(data.message||'API Error');
+        totalCount=data.totalCount||0;
+        const sales=data.sales||[];
+        allSales=currentPage===1?sales:[...allSales,...sales];
+        if(currentPage===1){renderSummary();renderChart();}
+        renderList(sales);
+        document.getElementById('summaryArea').style.display='grid';
+        document.getElementById('chartSection').style.display='block';
+        document.getElementById('statusArea').style.display='none';
+        document.getElementById('listArea').style.display='block';
+        document.getElementById('loadMoreBtn').style.display=currentPage<Math.ceil(totalCount/PAGE_ROW)?'block':'none';
+    } catch(e){showMsg(`조회 실패: ${e.message}`,true);}
+}
+function loadMore(){fetchData(currentPage+1);}
 
-    function shiftDate(offset) {
-        const [y, m, d] = currentDate.split('-').map(Number);
-        const dt = new Date(y, m-1, d + offset);
-        currentDate = toDateStr(dt);
-        updateDateUI();
-        fetchData(1);
-    }
+// ── Summary ──
+function renderSummary() {
+    const used=allSales.filter(s=>!s.isCanceled).length;
+    const canceled=allSales.filter(s=>s.isCanceled).length;
+    const supply=allSales.reduce((sum,s)=>sum+(s.supplyPrice||0),0);
+    document.getElementById('sumTotal').textContent=formatNum(totalCount)+'건';
+    document.getElementById('sumSupply').textContent=formatNum(supply)+'원';
+    document.getElementById('sumUsed').textContent=formatNum(used)+'건';
+    document.getElementById('sumCancel').textContent=formatNum(canceled)+'건';
+}
 
-    function openDatePicker() {
-        const input = document.getElementById('dateInput');
-        input.value = currentDate;
-        input.showPicker();
-    }
+// ── Chart ──
+function renderChart() {
+    const hours=Array(24).fill(0);
+    allSales.forEach(s=>{if(s.useDate){const h=new Date(s.useDate*1000).getHours();hours[h]++;}});
+    const max=Math.max(...hours,1);
+    document.getElementById('chartCount').textContent=allSales.length;
+    const wrap=document.getElementById('chartBars');
+    wrap.innerHTML='';
+    hours.forEach((cnt,h)=>{
+        const pct=Math.round((cnt/max)*100);
+        const active=selectedHour===h?'active':'';
+        wrap.innerHTML+=`<div class="chart-bar-wrap ${active}" onclick="toggleHourFilter(${h})"><div class="chart-val">${cnt||''}</div><div class="chart-bar ${cnt===0?'zero':''}" style="height:${Math.max(pct,2)}%"></div><div class="chart-label">${h}</div></div>`;
+    });
+}
 
-    function onDateChange() {
-        currentDate = document.getElementById('dateInput').value;
-        updateDateUI();
-        fetchData(1);
-    }
+function toggleHourFilter(h) {
+    selectedHour = selectedHour===h ? -1 : h;
+    renderChart();
+    applyFilters();
+    const tag=document.getElementById('hourFilterTag');
+    if(selectedHour>=0){
+        tag.classList.add('show');
+        document.getElementById('hourFilterText').textContent=`${selectedHour}시 ~ ${selectedHour}:59 필터 적용중`;
+    } else { tag.classList.remove('show'); }
+}
 
-    function updateDateUI() {
-        document.getElementById('dateDisplay').textContent = formatDisplay(currentDate);
-    }
+function clearHourFilter() { selectedHour=-1; renderChart(); applyFilters(); document.getElementById('hourFilterTag').classList.remove('show'); }
 
-    // ── Format ──
-    function formatTime(ts) {
-        if (!ts) return '';
-        const d = new Date(ts * 1000);
-        return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    }
+// ── List ──
+function renderList(sales) {
+    const container=document.getElementById('listContainer');
+    sales.forEach((s,idx)=>{
+        const card=document.createElement('div');
+        card.className='sale-card';
+        card.dataset.couponId=s.couponId;
+        card.dataset.payRoom=s.payRoomIdx||'';
+        card.dataset.leader=(s.leaderName||'').replace(/\*/g,'');
+        card.dataset.hour=s.useDate?new Date(s.useDate*1000).getHours():'';
+        card.onclick=()=>openDetail(s.couponId);
+        const statusTag=s.isCanceled?'<span class="sale-tag t-cancel">취소</span>':'<span class="sale-tag t-done">완료</span>';
+        const typeTag=s.couponType==='SINGLE'?'<span class="sale-tag t-single">단체</span>':'<span class="sale-tag t-group">그룹</span>';
+        card.innerHTML=`
+            <div class="sale-top">
+                <div><div class="sale-leader">${s.leaderName||'-'}</div><div class="sale-company">${s.comName||''}</div></div>
+                <div><div class="sale-price">${formatNum(s.supplyPrice)}원</div><div class="sale-price-label">${s.member||1}명</div></div>
+            </div>
+            <div class="sale-menu">${s.menuName||'-'}</div>
+            <div class="sale-bottom">
+                ${statusTag}${typeTag}
+                <span class="sale-meta">${formatTime(s.useDate)}</span>
+                <span class="sale-payroom">#${s.payRoomIdx||'-'}</span>
+            </div>`;
+        container.appendChild(card);
+    });
+    document.getElementById('listCount').textContent=`총 ${formatNum(totalCount)}건`;
+}
 
-    function formatNum(n) {
-        return (n || 0).toLocaleString('ko-KR');
-    }
+// ── Search + Hour Filter ──
+function filterList() { applyFilters(); }
+function applyFilters() {
+    const q=document.getElementById('searchInput').value.trim().toLowerCase();
+    document.querySelectorAll('.sale-card').forEach(card=>{
+        const payRoom=(card.dataset.payRoom||'').toLowerCase();
+        const leader=(card.dataset.leader||'').toLowerCase();
+        const text=card.textContent.toLowerCase();
+        const hour=parseInt(card.dataset.hour,10);
+        const matchSearch=!q||payRoom.includes(q)||leader.includes(q)||text.includes(q);
+        const matchHour=selectedHour<0||hour===selectedHour;
+        card.style.display=(matchSearch&&matchHour)?'':'none';
+    });
+}
 
-    // ── Fetch ──
-    async function fetchData(page) {
-        const { token, storeId } = getConfig();
-        if (!token || !storeId) {
-            showMsg('Token 또는 Store ID를 설정해주세요.', true);
-            return;
-        }
-
-        currentPage = page || 1;
-        if (currentPage === 1) {
-            document.getElementById('listContainer').innerHTML = '';
-        }
-
-        showMsg('<div class="spinner"></div>불러오는 중...', false);
-
-        try {
-            const url = `${API_BASE}?sid=${storeId}&date=${currentDate}&page=${currentPage}&pageRow=${PAGE_ROW}`;
-            const res = await fetch(url, {
-                headers: {
-                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
-                    'x-store-gsid': storeId,
-                    'x-user-agent': 'Vendys/1.0 {"client": "SikdaeUser", "os": "web", "JsVersion": "2.63.0"}',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-
-            if (data.status && data.status < 0) throw new Error(data.message || 'API Error');
-
-            totalCount = data.totalCount || 0;
-            const sales = data.sales || [];
-
-            if (currentPage === 1) renderSummary(sales);
-            renderList(sales);
-
-            document.getElementById('summaryArea').style.display = 'grid';
-            document.getElementById('statusArea').style.display = 'none';
-            document.getElementById('listArea').style.display = 'block';
-
-            const totalPages = Math.ceil(totalCount / PAGE_ROW);
-            document.getElementById('loadMoreBtn').style.display = currentPage < totalPages ? 'block' : 'none';
-        } catch (e) {
-            showMsg(`조회 실패: ${e.message}`, true);
-        }
-    }
-
-    function loadMore() {
-        fetchData(currentPage + 1);
-    }
-
-    // ── Summary ──
-    function renderSummary(sales) {
-        const used = sales.filter(s => !s.isCanceled).length;
-        const canceled = sales.filter(s => s.isCanceled).length;
-        const totalSupply = sales.reduce((sum, s) => sum + (s.supplyPrice || 0), 0);
-
-        document.getElementById('sumTotal').textContent = formatNum(totalCount) + '건';
-        document.getElementById('sumSupply').textContent = formatNum(totalSupply) + '원';
-        document.getElementById('sumUsed').textContent = formatNum(used) + '건';
-        document.getElementById('sumCancel').textContent = formatNum(canceled) + '건';
-    }
-
-    // ── List ──
-    function renderList(sales) {
-        const container = document.getElementById('listContainer');
-
-        sales.forEach((s, idx) => {
-            const seq = (currentPage - 1) * PAGE_ROW + idx + 1;
-            const statusTag = s.isCanceled
-                ? '<span class="sale-tag t-cancel">취소</span>'
-                : '<span class="sale-tag t-done">완료</span>';
-            const typeTag = s.couponType === 'SINGLE'
-                ? '<span class="sale-tag t-single">단체</span>'
-                : '<span class="sale-tag t-group">그룹</span>';
-
-            const card = document.createElement('div');
-            card.className = 'sale-card';
-            card.innerHTML = `
-                <div class="sale-top">
-                    <div>
-                        <div class="sale-leader">${s.leaderName || '-'}</div>
-                        <div class="sale-company">${s.comName || ''}</div>
-                    </div>
-                    <div>
-                        <div class="sale-price">${formatNum(s.supplyPrice)}원</div>
-                        <div class="sale-price-label">${s.member || 1}명</div>
-                    </div>
-                </div>
-                <div class="sale-menu">${s.menuName || '-'}</div>
-                <div class="sale-bottom">
-                    ${statusTag}${typeTag}
-                    <span class="sale-meta">${formatTime(s.useDate)}</span>
-                    <span class="sale-store">${s.storeName || ''}</span>
-                </div>
-            `;
-            container.appendChild(card);
+// ── Detail ──
+async function openDetail(couponId) {
+    document.getElementById('sheetOverlay').classList.add('show');
+    document.getElementById('sheetContent').innerHTML='<div class="state-msg"><div class="spinner"></div></div>';
+    try {
+        const {storeId}=getConfig();
+        const res=await fetch(`${API_BASE}/${couponId}?sid=${storeId}`,{headers:getAuthHeader()});
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        const data=await res.json();
+        if(data.status&&data.status<0)throw new Error(data.message);
+        const c=data.coupon;
+        const menus=data.menus||[];
+        const statusText=c.paymentStatus==='USED'?'사용완료':c.paymentStatus==='CANCELED'?'취소':c.paymentStatus;
+        let html=`
+            <div class="sheet-title">${c.leaderName||'-'}</div>
+            <div class="sheet-sub">${c.comName||''} · #${c.payRoomIdx||'-'}</div>
+            <div class="sheet-row"><span class="sheet-label">결제번호</span><span class="sheet-val">${c.payRoomIdx||'-'}</span></div>
+            <div class="sheet-row"><span class="sheet-label">쿠폰ID</span><span class="sheet-val" style="font-size:.7rem;">${c.couponId}</span></div>
+            <div class="sheet-row"><span class="sheet-label">상태</span><span class="sheet-val">${statusText}</span></div>
+            <div class="sheet-row"><span class="sheet-label">결제유형</span><span class="sheet-val">${c.couponType==='SINGLE'?'단체':'그룹'}</span></div>
+            <div class="sheet-row"><span class="sheet-label">결제금액</span><span class="sheet-val" style="font-weight:700;">${formatNum(c.totalSupplyPrice)}원</span></div>
+            <div class="sheet-row"><span class="sheet-label">사용일시</span><span class="sheet-val">${formatTime(c.useDate)}</span></div>
+            <div class="sheet-row"><span class="sheet-label">등록일시</span><span class="sheet-val">${formatTime(c.regDate)}</span></div>
+            <div class="sheet-row"><span class="sheet-label">취소가능</span><span class="sheet-val">${c.isCancelable?'가능':'불가'}</span></div>
+            <div class="sheet-section">주문 메뉴 (${menus.length})</div>`;
+        menus.forEach(m=>{
+            html+=`<div class="menu-item-row"><div class="menu-item-name">${m.menuName}</div><div class="menu-item-price">${formatNum(m.sellPrice)}원 × ${m.count}개</div></div>`;
         });
-
-        document.getElementById('listCount').textContent = `총 ${formatNum(totalCount)}건`;
-        const totalPages = Math.ceil(totalCount / PAGE_ROW) || 1;
-        document.getElementById('listPageInfo').textContent = `${currentPage} / ${totalPages}`;
+        document.getElementById('sheetContent').innerHTML=html;
+    } catch(e) {
+        document.getElementById('sheetContent').innerHTML=`<div class="state-msg error">상세 조회 실패: ${e.message}</div>`;
     }
+}
 
-    // ── State ──
-    function showMsg(html, isError) {
-        const area = document.getElementById('statusArea');
-        area.style.display = 'block';
-        area.innerHTML = `<div class="state-msg ${isError ? 'error' : ''}">${html}</div>`;
-        document.getElementById('listArea').style.display = 'none';
-        if (isError) document.getElementById('summaryArea').style.display = 'none';
-    }
+function closeSheet(e) {
+    if(e&&e.target!==e.currentTarget)return;
+    document.getElementById('sheetOverlay').classList.remove('show');
+}
 
-    // ── Init ──
-    currentDate = toDateStr(new Date());
-    updateDateUI();
-    fetchData(1);
+function showMsg(html,isErr) {
+    document.getElementById('statusArea').style.display='block';
+    document.getElementById('statusArea').innerHTML=`<div class="state-msg ${isErr?'error':''}">${html}</div>`;
+    document.getElementById('listArea').style.display='none';
+    if(isErr){document.getElementById('summaryArea').style.display='none';document.getElementById('chartSection').style.display='none';}
+}
+
+currentDate=toDateStr(new Date()); updateDateUI(); fetchData(1);
 </script>
 </body>
 </html>
