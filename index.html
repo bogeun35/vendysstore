@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Vendys - Planning Hub</title>
+    <style>
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-SemiBold.woff') format('woff');font-weight:600;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');font-weight:700;}
+
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;min-height:100vh;color:#1d1d1f;}
+
+        /* ── GNB ── */
+        .gnb{
+            position:sticky;top:0;z-index:100;
+            background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(20px);
+            border-bottom:1px solid #e5e5e7;
+            padding:0 32px;height:52px;
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        .gnb-logo{font-size:1rem;font-weight:700;letter-spacing:-.02em;color:#1d1d1f;display:flex;align-items:center;gap:8px;}
+        .gnb-logo .dot{width:8px;height:8px;border-radius:50%;background:#0071e3;}
+        .gnb-nav{display:flex;gap:4px;}
+        .gnb-nav a{
+            padding:6px 14px;border-radius:6px;font-size:.82rem;font-weight:500;
+            color:#6e6e73;text-decoration:none;transition:all .15s;
+        }
+        .gnb-nav a:hover{background:#f5f5f7;color:#1d1d1f;}
+        .gnb-nav a.active{background:#1d1d1f;color:#fff;}
+
+        /* ── Token Section ── */
+        .token-bar{
+            background:#fff;border-bottom:1px solid #e5e5e7;
+            padding:12px 32px;display:flex;align-items:center;gap:12px;
+        }
+        .token-bar label{font-size:.78rem;font-weight:600;color:#6e6e73;white-space:nowrap;}
+        .token-input{
+            flex:1;max-width:520px;padding:8px 14px;
+            border:1.5px solid #e5e5e7;border-radius:8px;
+            font-size:.85rem;font-family:inherit;background:#fafafa;
+            transition:border-color .2s,background .2s;
+        }
+        .token-input:focus{outline:none;border-color:#0071e3;background:#fff;}
+        .token-input::placeholder{color:#c7c7cc;}
+        .token-status{
+            font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:20px;
+            white-space:nowrap;
+        }
+        .token-status.connected{background:#e8f5e9;color:#2e7d32;}
+        .token-status.disconnected{background:#fce4ec;color:#c62828;}
+        .token-save-btn{
+            padding:8px 18px;border:none;border-radius:8px;
+            background:#0071e3;color:#fff;font-size:.82rem;font-weight:600;
+            font-family:inherit;cursor:pointer;transition:background .15s;white-space:nowrap;
+        }
+        .token-save-btn:hover{background:#0077ed;}
+
+        /* ── Main Content ── */
+        .main{max-width:1200px;margin:0 auto;padding:40px 32px 80px;}
+
+        .section-title{
+            font-size:.72rem;font-weight:600;color:#6e6e73;letter-spacing:.06em;
+            text-transform:uppercase;margin-bottom:16px;
+        }
+
+        /* ── Sitemap Grid ── */
+        .sitemap-grid{
+            display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;
+        }
+        .sitemap-card{
+            background:#fff;border-radius:12px;padding:20px 22px;
+            border:1px solid #e5e5e7;cursor:pointer;
+            transition:all .2s;position:relative;overflow:hidden;
+        }
+        .sitemap-card:hover{
+            border-color:#0071e3;box-shadow:0 2px 12px rgba(0,113,227,.1);
+            transform:translateY(-1px);
+        }
+        .sitemap-card .card-id{
+            font-size:.68rem;font-weight:600;color:#c7c7cc;margin-bottom:6px;
+        }
+        .sitemap-card .card-title{
+            font-size:.95rem;font-weight:700;color:#1d1d1f;margin-bottom:4px;
+        }
+        .sitemap-card .card-desc{
+            font-size:.78rem;color:#8e8e93;line-height:1.45;
+        }
+        .sitemap-card .card-tags{
+            display:flex;gap:4px;margin-top:12px;flex-wrap:wrap;
+        }
+        .sitemap-card .card-tag{
+            font-size:.68rem;font-weight:500;padding:2px 8px;border-radius:4px;
+            background:#f5f5f7;color:#6e6e73;
+        }
+        .sitemap-card .card-preview-hint{
+            position:absolute;top:16px;right:16px;
+            display:flex;gap:4px;
+        }
+        .preview-icon{
+            width:22px;height:16px;border-radius:3px;border:1.5px solid #d1d1d6;
+            display:flex;align-items:center;justify-content:center;
+            font-size:7px;font-weight:700;color:#8e8e93;
+        }
+        .preview-icon.mobile{width:12px;}
+
+        /* ── Preview Modal ── */
+        .preview-overlay{
+            position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+            z-index:200;display:none;align-items:flex-start;justify-content:center;
+            padding:20px;overflow-y:auto;
+        }
+        .preview-overlay.show{display:flex;}
+        .preview-container{
+            background:#1d1d1f;border-radius:16px;overflow:hidden;
+            width:100%;max-width:calc(375px + 1920px * 0.55 + 48px);
+            box-shadow:0 20px 60px rgba(0,0,0,.4);
+        }
+        .preview-header{
+            padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+            background:#2d2d2f;
+        }
+        .preview-title{color:#fff;font-size:.88rem;font-weight:600;}
+        .preview-close{
+            width:28px;height:28px;border-radius:50%;border:none;
+            background:#3a3a3c;color:#fff;font-size:1rem;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            transition:background .15s;
+        }
+        .preview-close:hover{background:#48484a;}
+        .preview-body{
+            display:flex;gap:16px;padding:16px;align-items:flex-start;
+            overflow-x:auto;
+        }
+        .preview-frame-wrap{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+        .preview-frame-label{
+            color:#8e8e93;font-size:.72rem;font-weight:600;
+            display:flex;align-items:center;gap:6px;
+        }
+        .preview-frame-label .size{color:#48484a;font-weight:400;}
+        .preview-frame{
+            border:1px solid #3a3a3c;border-radius:8px;overflow:hidden;
+            background:#fff;
+        }
+        .preview-frame iframe{border:none;display:block;}
+        .preview-mobile{width:375px;}
+        .preview-mobile iframe{width:375px;height:812px;}
+        .preview-desktop{width:calc(1920px * 0.55);}
+        .preview-desktop iframe{width:1920px;height:1080px;transform:scale(0.55);transform-origin:top left;}
+
+        /* ── Empty State ── */
+        .empty-state{
+            text-align:center;padding:80px 20px;color:#8e8e93;
+        }
+        .empty-state .icon{font-size:2.5rem;margin-bottom:12px;opacity:.5;}
+        .empty-state p{font-size:.88rem;line-height:1.5;}
+    </style>
+</head>
+<body>
+
+<!-- ── GNB ── -->
+<nav class="gnb">
+    <div class="gnb-logo">
+        <span class="dot"></span>
+        Store Vendys
+    </div>
+    <div class="gnb-nav">
+        <a href="#" class="active">Sitemap</a>
+    </div>
+</nav>
+
+<!-- ── Token Bar ── -->
+<div class="token-bar">
+    <label>API Token</label>
+    <input type="text" class="token-input" id="tokenInput" placeholder="Bearer token을 입력하세요...">
+    <span class="token-status disconnected" id="tokenStatus">Disconnected</span>
+    <button class="token-save-btn" onclick="saveToken()">Save</button>
+</div>
+
+<!-- ── Main ── -->
+<div class="main">
+    <div class="section-title">Sitemap</div>
+    <div class="sitemap-grid" id="sitemapGrid"></div>
+</div>
+
+<!-- ── Preview Modal ── -->
+<div class="preview-overlay" id="previewOverlay" onclick="closePreview(event)">
+    <div class="preview-container" onclick="event.stopPropagation()">
+        <div class="preview-header">
+            <span class="preview-title" id="previewTitle">Page Preview</span>
+            <button class="preview-close" onclick="closePreview()">&times;</button>
+        </div>
+        <div class="preview-body">
+            <div class="preview-frame-wrap preview-mobile">
+                <div class="preview-frame-label">
+                    Mobile <span class="size">375 &times; 812</span>
+                </div>
+                <div class="preview-frame">
+                    <iframe id="mobileFrame"></iframe>
+                </div>
+            </div>
+            <div class="preview-frame-wrap preview-desktop">
+                <div class="preview-frame-label">
+                    Desktop <span class="size">1920 &times; 1080</span>
+                </div>
+                <div class="preview-frame">
+                    <iframe id="desktopFrame"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Page Registry ──
+    const pages = [
+        // { id: 'P-001', title: '메인 홈', desc: '메인 랜딩 페이지', tags: ['홈', '랜딩'], path: 'pages/home.html' },
+        // { id: 'P-002', title: '로그인', desc: '로그인 / 회원가입', tags: ['인증'], path: 'pages/login.html' },
+    ];
+
+    // ── Render Sitemap ──
+    function renderSitemap() {
+        const grid = document.getElementById('sitemapGrid');
+        grid.innerHTML = '';
+
+        if (pages.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column:1/-1;">
+                    <div class="icon">&#128466;</div>
+                    <p>아직 등록된 페이지가 없습니다.<br>pages 배열에 페이지를 추가하세요.</p>
+                </div>`;
+            return;
+        }
+
+        pages.forEach(page => {
+            const card = document.createElement('div');
+            card.className = 'sitemap-card';
+            card.onclick = () => openPreview(page);
+            card.innerHTML = `
+                <div class="card-preview-hint">
+                    <div class="preview-icon mobile">M</div>
+                    <div class="preview-icon">D</div>
+                </div>
+                <div class="card-id">${page.id}</div>
+                <div class="card-title">${page.title}</div>
+                <div class="card-desc">${page.desc}</div>
+                <div class="card-tags">
+                    ${page.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                </div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    // ── Preview ──
+    function openPreview(page) {
+        const token = localStorage.getItem('sv_token') || '';
+        const sep = page.path.includes('?') ? '&' : '?';
+        const url = token ? `${page.path}${sep}token=${encodeURIComponent(token)}` : page.path;
+
+        document.getElementById('previewTitle').textContent = `${page.id} - ${page.title}`;
+        document.getElementById('mobileFrame').src = url;
+        document.getElementById('desktopFrame').src = url;
+        document.getElementById('previewOverlay').classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview(e) {
+        if (e && e.target !== e.currentTarget) return;
+        document.getElementById('previewOverlay').classList.remove('show');
+        document.getElementById('mobileFrame').src = '';
+        document.getElementById('desktopFrame').src = '';
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closePreview();
+    });
+
+    // ── Token ──
+    function saveToken() {
+        const val = document.getElementById('tokenInput').value.trim();
+        if (val) {
+            localStorage.setItem('sv_token', val);
+            updateTokenStatus(true);
+        } else {
+            localStorage.removeItem('sv_token');
+            updateTokenStatus(false);
+        }
+    }
+
+    function updateTokenStatus(connected) {
+        const el = document.getElementById('tokenStatus');
+        el.textContent = connected ? 'Connected' : 'Disconnected';
+        el.className = 'token-status ' + (connected ? 'connected' : 'disconnected');
+    }
+
+    // ── Init ──
+    (function init() {
+        const saved = localStorage.getItem('sv_token');
+        if (saved) {
+            document.getElementById('tokenInput').value = saved;
+            updateTokenStatus(true);
+        }
+        renderSitemap();
+    })();
+</script>
+</body>
+</html>
