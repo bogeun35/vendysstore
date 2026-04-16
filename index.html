@@ -171,12 +171,14 @@
     </div>
 </nav>
 
-<!-- ── Token Bar ── -->
+<!-- ── Config Bar ── -->
 <div class="token-bar">
     <label>API Token</label>
     <input type="text" class="token-input" id="tokenInput" placeholder="Bearer token을 입력하세요...">
+    <label>Store ID</label>
+    <input type="text" class="token-input" id="storeIdInput" placeholder="UUID (예: 46DE71D7-8F6D-...)" style="max-width:340px;">
     <span class="token-status disconnected" id="tokenStatus">Disconnected</span>
-    <button class="token-save-btn" onclick="saveToken()">Save</button>
+    <button class="token-save-btn" onclick="saveConfig()">Save</button>
 </div>
 
 <!-- ── Main ── -->
@@ -216,8 +218,7 @@
 <script>
     // ── Page Registry ──
     const pages = [
-        // { id: 'P-001', title: '메인 홈', desc: '메인 랜딩 페이지', tags: ['홈', '랜딩'], path: 'pages/home.html' },
-        // { id: 'P-002', title: '로그인', desc: '로그인 / 회원가입', tags: ['인증'], path: 'pages/login.html' },
+        { id: 'P-001', title: '매출현황', desc: '쿠폰 사용 매출 현황 조회 (일자별)', tags: ['매출', '쿠폰', 'API'], path: 'pages/sales.html' },
     ];
 
     // ── Render Sitemap ──
@@ -255,13 +256,9 @@
 
     // ── Preview ──
     function openPreview(page) {
-        const token = localStorage.getItem('sv_token') || '';
-        const sep = page.path.includes('?') ? '&' : '?';
-        const url = token ? `${page.path}${sep}token=${encodeURIComponent(token)}` : page.path;
-
         document.getElementById('previewTitle').textContent = `${page.id} - ${page.title}`;
-        document.getElementById('mobileFrame').src = url;
-        document.getElementById('desktopFrame').src = url;
+        document.getElementById('mobileFrame').src = page.path;
+        document.getElementById('desktopFrame').src = page.path;
         document.getElementById('previewOverlay').classList.add('show');
         document.body.style.overflow = 'hidden';
     }
@@ -278,16 +275,15 @@
         if (e.key === 'Escape') closePreview();
     });
 
-    // ── Token ──
-    function saveToken() {
-        const val = document.getElementById('tokenInput').value.trim();
-        if (val) {
-            localStorage.setItem('sv_token', val);
-            updateTokenStatus(true);
-        } else {
-            localStorage.removeItem('sv_token');
-            updateTokenStatus(false);
-        }
+    // ── Config ──
+    function saveConfig() {
+        const token = document.getElementById('tokenInput').value.trim();
+        const storeId = document.getElementById('storeIdInput').value.trim();
+        if (token) localStorage.setItem('sv_token', token);
+        else localStorage.removeItem('sv_token');
+        if (storeId) localStorage.setItem('sv_store_id', storeId);
+        else localStorage.removeItem('sv_store_id');
+        updateTokenStatus(!!token && !!storeId);
     }
 
     function updateTokenStatus(connected) {
@@ -298,11 +294,11 @@
 
     // ── Init ──
     (function init() {
-        const saved = localStorage.getItem('sv_token');
-        if (saved) {
-            document.getElementById('tokenInput').value = saved;
-            updateTokenStatus(true);
-        }
+        const token = localStorage.getItem('sv_token');
+        const storeId = localStorage.getItem('sv_store_id');
+        if (token) document.getElementById('tokenInput').value = token;
+        if (storeId) document.getElementById('storeIdInput').value = storeId;
+        updateTokenStatus(!!token && !!storeId);
         renderSitemap();
     })();
 </script>
