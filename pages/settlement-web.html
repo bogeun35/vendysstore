@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매출정산</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-SemiBold.woff') format('woff');font-weight:600;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');font-weight:700;}
+
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;min-height:100vh;color:#1d1d1f;}
+
+        .page-header{background:#fff;border-bottom:1px solid #e5e5e7;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;}
+        .page-title{font-size:1.05rem;font-weight:700;}
+        .header-right{display:flex;align-items:center;gap:10px;}
+        .year-nav{display:flex;align-items:center;gap:4px;}
+        .year-arrow{width:30px;height:30px;border:1px solid #e5e5e7;border-radius:6px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;}
+        .year-arrow:hover{background:#f5f5f7;}
+        .year-display{font-size:.95rem;font-weight:700;min-width:50px;text-align:center;}
+        .excel-btn{padding:6px 14px;border:1px solid #2e7d32;border-radius:6px;background:#fff;color:#2e7d32;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;}
+        .excel-btn:hover{background:#e8f5e9;}
+        .excel-btn:disabled{opacity:.5;cursor:default;}
+
+        /* ── Stats Row ── */
+        .stats-row{display:flex;gap:12px;padding:16px 32px;}
+        .summary-cards{display:flex;gap:10px;flex:1;}
+        .summary-card{background:#fff;border-radius:8px;padding:12px 18px;border:1px solid #e5e5e7;flex:1;}
+        .summary-card .label{font-size:.72rem;font-weight:500;color:#8e8e93;margin-bottom:2px;}
+        .summary-card .value{font-size:1.15rem;font-weight:700;}
+        .summary-card .value.blue{color:#0071e3;}
+
+        /* ── Month Buttons ── */
+        .month-bar{padding:0 32px 12px;display:flex;gap:4px;align-items:center;}
+        .month-btn{
+            padding:5px 12px;border:1px solid #e5e5e7;border-radius:6px;
+            background:#fff;font-size:.75rem;font-weight:600;color:#1d1d1f;
+            font-family:inherit;cursor:pointer;transition:all .12s;
+        }
+        .month-btn:hover{background:#f5f5f7;}
+        .month-btn.active{background:#0071e3;color:#fff;border-color:#0071e3;}
+        .month-btn-all{
+            padding:5px 14px;border:1px solid #e5e5e7;border-radius:6px;
+            background:#f9fafb;font-size:.75rem;font-weight:600;color:#8e8e93;
+            font-family:inherit;cursor:pointer;margin-right:4px;
+        }
+        .month-btn-all.active{background:#1d1d1f;color:#fff;border-color:#1d1d1f;}
+
+        /* ── Table ── */
+        .table-wrap{padding:0 32px 40px;}
+        .table-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+        .table-count{font-size:.78rem;color:#8e8e93;font-weight:500;}
+
+        table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e5e7;}
+        thead{background:#f9fafb;}
+        th{padding:9px 14px;text-align:left;font-size:.72rem;font-weight:600;color:#8e8e93;border-bottom:1px solid #e5e5e7;white-space:nowrap;}
+        td{padding:8px 14px;font-size:.8rem;border-bottom:1px solid #f0f1f3;}
+        tbody tr:hover{background:#fafbfc;}
+        .text-right{text-align:right;}.text-center{text-align:center;}
+        .sub-text{font-size:.72rem;color:#8e8e93;}
+        .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:600;}
+        .tag-ready{background:#fff3e0;color:#e65100;}
+        .tag-done{background:#e8f5e9;color:#2e7d32;}
+        .tag-etc{background:#f0f0f2;color:#8e8e93;}
+        .partner-name{font-weight:600;}
+
+        .state-msg{text-align:center;padding:60px 20px;color:#8e8e93;font-size:.88rem;}
+        .state-msg.error{color:#c62828;}
+        .spinner{width:28px;height:28px;border:3px solid #e5e5e7;border-top-color:#0071e3;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="page-title">매출정산</div>
+    <div class="header-right">
+        <div class="year-nav">
+            <button class="year-arrow" onclick="shiftYear(-1)">&larr;</button>
+            <div class="year-display" id="yearDisplay"></div>
+            <button class="year-arrow" onclick="shiftYear(1)">&rarr;</button>
+        </div>
+        <button class="excel-btn" id="excelBtn" onclick="downloadExcel()" disabled>Excel</button>
+    </div>
+</div>
+
+<div class="stats-row" id="statsRow" style="display:none;">
+    <div class="summary-cards">
+        <div class="summary-card"><div class="label">건수</div><div class="value blue" id="sumCount">0</div></div>
+        <div class="summary-card"><div class="label">총 매출</div><div class="value" id="sumSales">0</div></div>
+        <div class="summary-card"><div class="label">수수료</div><div class="value" id="sumFee">0</div></div>
+        <div class="summary-card"><div class="label">정산액</div><div class="value blue" id="sumSettle">0</div></div>
+    </div>
+</div>
+
+<div class="month-bar" id="monthBar">
+    <button class="month-btn-all active" id="monthAllBtn" onclick="selectMonth(0)">전체</button>
+</div>
+
+<div class="table-wrap">
+    <div id="statusArea"></div>
+    <div id="tableArea" style="display:none;">
+        <div class="table-info"><span class="table-count" id="tableCount"></span></div>
+        <table>
+            <thead><tr>
+                <th class="text-center" style="width:36px">#</th>
+                <th>정산월</th>
+                <th>정산번호</th>
+                <th>파트너</th>
+                <th>정산기간</th>
+                <th class="text-right">매출액</th>
+                <th class="text-right">수수료</th>
+                <th class="text-right">정산액</th>
+                <th class="text-center">정산상태</th>
+                <th class="text-center">입금상태</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const API_BASE='https://store-api.sikdae.com/finance/v1/settlements';
+let currentYear=new Date().getFullYear(), selectedMonth=0, allData=[];
+
+function getConfig(){return{token:localStorage.getItem('sv_token')||'',storeId:localStorage.getItem('sv_store_id')||''};}
+function getAuthHeader(){const{token,storeId}=getConfig();return{'Authorization':token.startsWith('Bearer ')?token:`Bearer ${token}`,'x-store-gsid':storeId,'x-user-agent':'Vendys/1.0 {"client":"SikdaeUser","os":"web","JsVersion":"2.63.0"}','Accept':'application/json'};}
+function formatNum(n){return(n||0).toLocaleString('ko-KR');}
+
+function shiftYear(o){currentYear+=o;selectedMonth=0;updateUI();fetchData();}
+function selectMonth(m){selectedMonth=m;updateMonthUI();renderTable();renderSummary();}
+
+function updateUI(){document.getElementById('yearDisplay').textContent=currentYear+'년';updateMonthUI();}
+function updateMonthUI(){
+    const bar=document.getElementById('monthBar');
+    bar.innerHTML=`<button class="month-btn-all ${selectedMonth===0?'active':''}" onclick="selectMonth(0)">전체</button>`;
+    for(let m=1;m<=12;m++) bar.innerHTML+=`<button class="month-btn ${selectedMonth===m?'active':''}" onclick="selectMonth(${m})">${m}월</button>`;
+}
+
+async function fetchData(){
+    const{token,storeId}=getConfig();
+    if(!token||!storeId){showMsg('Token / Store ID를 설정해주세요.',true);return;}
+    showMsg('<div class="spinner"></div>불러오는 중...');
+    try{
+        const res=await fetch(`${API_BASE}?year=${currentYear}`,{headers:getAuthHeader()});
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        const data=await res.json();
+        allData=data.content||[];
+        renderSummary();renderTable();
+        document.getElementById('statsRow').style.display='flex';
+        document.getElementById('statusArea').style.display='none';
+        document.getElementById('tableArea').style.display='block';
+        document.getElementById('excelBtn').disabled=false;
+    }catch(e){showMsg(`조회 실패: ${e.message}`,true);}
+}
+
+function getFiltered(){
+    if(selectedMonth===0)return allData;
+    return allData.filter(d=>parseInt(d.settlementStartDate.split('-')[1],10)===selectedMonth);
+}
+
+function renderSummary(){
+    const f=getFiltered();
+    document.getElementById('sumCount').textContent=f.length+'건';
+    document.getElementById('sumSales').textContent=formatNum(f.reduce((s,d)=>s+(d.salesAmount||0),0))+'원';
+    document.getElementById('sumFee').textContent=formatNum(f.reduce((s,d)=>s+(d.feeAmount||0),0))+'원';
+    document.getElementById('sumSettle').textContent=formatNum(f.reduce((s,d)=>s+(d.settlementAmount||0),0))+'원';
+}
+
+function renderTable(){
+    const tbody=document.getElementById('tbody');tbody.innerHTML='';
+    const filtered=getFiltered();
+    filtered.forEach((d,i)=>{
+        const m=parseInt(d.settlementStartDate.split('-')[1],10);
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+            <td class="text-center sub-text">${i+1}</td>
+            <td>${d.settlementName||m+'월'}</td>
+            <td class="sub-text">${d.settlementIdx}</td>
+            <td class="partner-name">${d.linkedPartner||d.bizName||'-'}</td>
+            <td class="sub-text">${d.settlementStartDate} ~ ${d.settlementEndDate}</td>
+            <td class="text-right">${formatNum(d.salesAmount)}원</td>
+            <td class="text-right">${formatNum(d.feeAmount)}원</td>
+            <td class="text-right" style="font-weight:600;">${formatNum(d.settlementAmount)}원</td>
+            <td class="text-center">${sTag(d.status)}</td>
+            <td class="text-center">${dTag(d.depositStatus)}</td>`;
+        tbody.appendChild(tr);
+    });
+    document.getElementById('tableCount').textContent=`총 ${filtered.length}건`;
+}
+
+function sTag(s){
+    if(s==='DONE')return'<span class="tag tag-done">정산완료</span>';
+    if(s==='READY')return'<span class="tag tag-ready">정산대기</span>';
+    return`<span class="tag tag-etc">${s||'-'}</span>`;
+}
+function dTag(s){
+    if(s==='DONE')return'<span class="tag tag-done">입금완료</span>';
+    if(s==='READY')return'<span class="tag tag-ready">입금대기</span>';
+    if(!s)return'<span class="sub-text">-</span>';
+    return`<span class="tag tag-etc">${s}</span>`;
+}
+
+function downloadExcel(){
+    const filtered=getFiltered();
+    const rows=[['#','정산월','정산번호','파트너','사업자명','사업자번호','정산기간 시작','정산기간 종료','매출액','수수료','정산액','정산상태','입금상태']];
+    filtered.forEach((d,i)=>{
+        rows.push([i+1,d.settlementName||'',d.settlementIdx,d.linkedPartner||'',d.bizName||'',d.bizNumber||'',d.settlementStartDate,d.settlementEndDate,d.salesAmount||0,d.feeAmount||0,d.settlementAmount||0,d.status||'',d.depositStatus||'']);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:5},{wch:8},{wch:10},{wch:20},{wch:14},{wch:14},{wch:12},{wch:12},{wch:12},{wch:10},{wch:12},{wch:10},{wch:10}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'매출정산');
+    const monthStr=selectedMonth>0?`${selectedMonth}월`:'전체';
+    XLSX.writeFile(wb,`매출정산_${currentYear}년_${monthStr}_${filtered.length}건.xlsx`);
+}
+
+function showMsg(html,isErr){
+    document.getElementById('statusArea').style.display='block';
+    document.getElementById('statusArea').innerHTML=`<div class="state-msg ${isErr?'error':''}">${html}</div>`;
+    document.getElementById('tableArea').style.display='none';
+    if(isErr)document.getElementById('statsRow').style.display='none';
+}
+
+updateUI();fetchData();
+</script>
+</body>
+</html>

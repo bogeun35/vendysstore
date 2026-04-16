@@ -6,23 +6,189 @@
     <title>매출정산</title>
     <style>
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-SemiBold.woff') format('woff');font-weight:600;}
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');font-weight:700;}
+
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;color:#1d1d1f;-webkit-font-smoothing:antialiased;}
+
         .app-header{position:sticky;top:0;z-index:10;background:#fff;padding:0 16px;border-bottom:1px solid #f0f0f2;}
         .header-top{height:44px;display:flex;align-items:center;justify-content:center;}
         .header-title{font-size:.95rem;font-weight:700;}
-        .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 44px);color:#aeaeb2;gap:8px;}
-        .empty-icon{font-size:2rem;opacity:.4;}
-        .empty-text{font-size:.85rem;}
+
+        /* ── Filter ── */
+        .filter-bar{padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+        .year-nav{display:flex;align-items:center;justify-content:center;gap:8px;}
+        .year-arrow{width:32px;height:32px;border:none;border-radius:50%;background:#f0f0f2;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1d1d1f;font-family:inherit;}
+        .year-arrow:active{background:#d1d1d6;}
+        .year-display{font-size:1rem;font-weight:700;min-width:60px;text-align:center;}
+        .month-grid{display:flex;flex-wrap:wrap;gap:4px;}
+        .month-btn{
+            flex:1;min-width:calc((100% - 44px) / 12);padding:6px 0;border:none;border-radius:8px;
+            background:#fff;font-size:.72rem;font-weight:600;color:#1d1d1f;
+            font-family:inherit;cursor:pointer;text-align:center;transition:all .12s;
+        }
+        .month-btn.active{background:#0071e3;color:#fff;}
+        .month-btn-all{
+            width:100%;padding:6px 0;border:none;border-radius:8px;
+            background:#f0f0f2;font-size:.72rem;font-weight:600;color:#8e8e93;
+            font-family:inherit;cursor:pointer;margin-bottom:2px;
+        }
+        .month-btn-all.active{background:#1d1d1f;color:#fff;}
+
+        /* ── Summary ── */
+        .summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px 12px;}
+        .sum-card{background:#fff;border-radius:12px;padding:10px 12px;}
+        .sum-card .label{font-size:.65rem;color:#8e8e93;font-weight:500;margin-bottom:2px;}
+        .sum-card .val{font-size:.95rem;font-weight:700;}
+        .sum-card .val.c-blue{color:#0071e3;}
+
+        /* ── List ── */
+        .list-section{padding:0 16px 100px;}
+        .month-group-header{font-size:.75rem;font-weight:700;color:#8e8e93;padding:12px 0 6px;border-bottom:1px solid #e5e5e7;margin-bottom:8px;}
+        .settle-card{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:8px;}
+        .settle-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+        .settle-partner{font-size:.88rem;font-weight:600;}
+        .settle-period{font-size:.68rem;color:#8e8e93;margin-top:2px;}
+        .settle-amount{font-size:1rem;font-weight:700;text-align:right;}
+        .settle-amount-label{font-size:.65rem;color:#8e8e93;text-align:right;}
+        .settle-row{display:flex;justify-content:space-between;padding:4px 0;}
+        .settle-row-label{font-size:.72rem;color:#8e8e93;}
+        .settle-row-val{font-size:.72rem;font-weight:600;}
+        .settle-bottom{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f2;}
+        .settle-tag{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;}
+        .t-ready{background:#fff3e0;color:#e65100;}
+        .t-done{background:#e8f5e9;color:#2e7d32;}
+        .t-etc{background:#f0f0f2;color:#8e8e93;}
+        .settle-idx{font-size:.65rem;color:#aeaeb2;margin-left:auto;}
+
+        .state-msg{text-align:center;padding:60px 20px;color:#8e8e93;font-size:.85rem;}
+        .state-msg.error{color:#ff3b30;}
+        .spinner{width:28px;height:28px;border:3px solid #e5e5e7;border-top-color:#0071e3;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px;}
+        @keyframes spin{to{transform:rotate(360deg)}}
     </style>
 </head>
 <body>
-    <div class="app-header"><div class="header-top"><div class="header-title">매출정산</div></div></div>
-    <div class="empty">
-        <div class="empty-icon">&#128679;</div>
-        <div class="empty-text">준비 중입니다</div>
+
+<div class="app-header"><div class="header-top"><div class="header-title">매출정산</div></div></div>
+
+<div class="filter-bar">
+    <div class="year-nav">
+        <button class="year-arrow" onclick="shiftYear(-1)">&larr;</button>
+        <div class="year-display" id="yearDisplay"></div>
+        <button class="year-arrow" onclick="shiftYear(1)">&rarr;</button>
     </div>
+    <button class="month-btn-all active" id="monthAllBtn" onclick="selectMonth(0)">전체</button>
+    <div class="month-grid" id="monthGrid"></div>
+</div>
+
+<div class="summary" id="summaryArea" style="display:none;">
+    <div class="sum-card"><div class="label">총 매출</div><div class="val" id="sumSales">0</div></div>
+    <div class="sum-card"><div class="label">수수료</div><div class="val" id="sumFee">0</div></div>
+    <div class="sum-card"><div class="label">정산액</div><div class="val c-blue" id="sumSettle">0</div></div>
+</div>
+
+<div class="list-section">
+    <div id="statusArea"></div>
+    <div id="listArea" style="display:none;"></div>
+</div>
+
+<script>
+const API_BASE='https://store-api.sikdae.com/finance/v1/settlements';
+let currentYear=new Date().getFullYear(), selectedMonth=0, allData=[];
+
+function getConfig(){return{token:localStorage.getItem('sv_token')||'',storeId:localStorage.getItem('sv_store_id')||''};}
+function getAuthHeader(){const{token,storeId}=getConfig();return{'Authorization':token.startsWith('Bearer ')?token:`Bearer ${token}`,'x-store-gsid':storeId,'x-user-agent':'Vendys/1.0 {"client":"SikdaeUser","os":"web","JsVersion":"2.63.0"}','Accept':'application/json'};}
+function formatNum(n){return(n||0).toLocaleString('ko-KR');}
+
+function shiftYear(o){currentYear+=o;selectedMonth=0;updateUI();fetchData();}
+function selectMonth(m){selectedMonth=m;updateMonthUI();renderList();}
+
+function updateUI(){document.getElementById('yearDisplay').textContent=currentYear+'년';updateMonthUI();}
+function updateMonthUI(){
+    const grid=document.getElementById('monthGrid');grid.innerHTML='';
+    for(let m=1;m<=12;m++) grid.innerHTML+=`<button class="month-btn ${selectedMonth===m?'active':''}" onclick="selectMonth(${m})">${m}월</button>`;
+    document.getElementById('monthAllBtn').className='month-btn-all'+(selectedMonth===0?' active':'');
+}
+
+async function fetchData(){
+    const{token,storeId}=getConfig();
+    if(!token||!storeId){showMsg('Token / Store ID를 설정해주세요.',true);return;}
+    showMsg('<div class="spinner"></div>불러오는 중...');
+    try{
+        const url=`${API_BASE}?year=${currentYear}`;
+        const res=await fetch(url,{headers:getAuthHeader()});
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        const data=await res.json();
+        allData=data.content||[];
+        renderSummary();renderList();
+        document.getElementById('summaryArea').style.display='grid';
+        document.getElementById('statusArea').style.display='none';
+        document.getElementById('listArea').style.display='block';
+    }catch(e){showMsg(`조회 실패: ${e.message}`,true);}
+}
+
+function getFiltered(){
+    if(selectedMonth===0)return allData;
+    return allData.filter(d=>parseInt(d.settlementStartDate.split('-')[1],10)===selectedMonth);
+}
+
+function renderSummary(){
+    const f=getFiltered();
+    document.getElementById('sumSales').textContent=formatNum(f.reduce((s,d)=>s+(d.salesAmount||0),0))+'원';
+    document.getElementById('sumFee').textContent=formatNum(f.reduce((s,d)=>s+(d.feeAmount||0),0))+'원';
+    document.getElementById('sumSettle').textContent=formatNum(f.reduce((s,d)=>s+(d.settlementAmount||0),0))+'원';
+}
+
+function renderList(){
+    renderSummary();
+    const container=document.getElementById('listArea');container.innerHTML='';
+    const filtered=getFiltered();
+    if(!filtered.length){container.innerHTML='<div class="state-msg">정산 데이터가 없습니다.</div>';return;}
+    const groups={};
+    filtered.forEach(d=>{const m=d.settlementStartDate.substring(0,7);if(!groups[m])groups[m]=[];groups[m].push(d);});
+    Object.keys(groups).sort().reverse().forEach(month=>{
+        const[,m]=month.split('-');
+        container.innerHTML+=`<div class="month-group-header">${+m}월 정산</div>`;
+        groups[month].forEach(d=>{
+            container.innerHTML+=`
+            <div class="settle-card">
+                <div class="settle-top">
+                    <div><div class="settle-partner">${d.linkedPartner||d.bizName||'-'}</div><div class="settle-period">${d.settlementStartDate} ~ ${d.settlementEndDate}</div></div>
+                    <div><div class="settle-amount">${formatNum(d.settlementAmount)}원</div><div class="settle-amount-label">정산액</div></div>
+                </div>
+                <div class="settle-row"><span class="settle-row-label">매출액</span><span class="settle-row-val">${formatNum(d.salesAmount)}원</span></div>
+                <div class="settle-row"><span class="settle-row-label">수수료</span><span class="settle-row-val">${formatNum(d.feeAmount)}원</span></div>
+                <div class="settle-bottom">
+                    ${statusTag(d.status)}${depositTag(d.depositStatus)}
+                    <span class="settle-idx">${d.settlementIdx}</span>
+                </div>
+            </div>`;
+        });
+    });
+}
+
+function statusTag(s){
+    if(s==='DONE')return'<span class="settle-tag t-done">정산완료</span>';
+    if(s==='READY')return'<span class="settle-tag t-ready">정산대기</span>';
+    return`<span class="settle-tag t-etc">${s||'-'}</span>`;
+}
+function depositTag(s){
+    if(s==='DONE')return'<span class="settle-tag t-done">입금완료</span>';
+    if(s==='READY')return'<span class="settle-tag t-ready">입금대기</span>';
+    if(!s)return'';
+    return`<span class="settle-tag t-etc">${s}</span>`;
+}
+
+function showMsg(html,isErr){
+    document.getElementById('statusArea').style.display='block';
+    document.getElementById('statusArea').innerHTML=`<div class="state-msg ${isErr?'error':''}">${html}</div>`;
+    document.getElementById('listArea').style.display='none';
+    if(isErr)document.getElementById('summaryArea').style.display='none';
+}
+
+updateUI();fetchData();
+</script>
 </body>
 </html>
