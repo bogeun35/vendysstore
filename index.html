@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Vendys - Planning Hub</title>
+    <title>Store Vendys</title>
     <style>
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
@@ -11,268 +11,190 @@
         @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');font-weight:700;}
 
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;min-height:100vh;color:#1d1d1f;}
+        html,body{height:100%;overflow:hidden;}
+        body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#1d1d1f;color:#1d1d1f;}
 
         /* ── GNB ── */
         .gnb{
-            position:sticky;top:0;z-index:100;
-            background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(20px);
-            border-bottom:1px solid #e5e5e7;
-            padding:0 32px;height:52px;
-            display:flex;align-items:center;justify-content:space-between;
-        }
-        .gnb-logo{font-size:1rem;font-weight:700;letter-spacing:-.02em;color:#1d1d1f;display:flex;align-items:center;gap:8px;}
-        .gnb-logo .dot{width:8px;height:8px;border-radius:50%;background:#0071e3;}
-        .gnb-nav{display:flex;gap:4px;}
-        .gnb-nav a{
-            padding:6px 14px;border-radius:6px;font-size:.82rem;font-weight:500;
-            color:#6e6e73;text-decoration:none;transition:all .15s;
-        }
-        .gnb-nav a:hover{background:#f5f5f7;color:#1d1d1f;}
-        .gnb-nav a.active{background:#1d1d1f;color:#fff;}
-
-        /* ── Token Section ── */
-        .token-bar{
-            background:#fff;border-bottom:1px solid #e5e5e7;
-            padding:12px 32px;display:flex;align-items:center;gap:12px;
-        }
-        .token-bar label{font-size:.78rem;font-weight:600;color:#6e6e73;white-space:nowrap;}
-        .token-input{
-            flex:1;max-width:520px;padding:8px 14px;
-            border:1.5px solid #e5e5e7;border-radius:8px;
-            font-size:.85rem;font-family:inherit;background:#fafafa;
-            transition:border-color .2s,background .2s;
-        }
-        .token-input:focus{outline:none;border-color:#0071e3;background:#fff;}
-        .token-input::placeholder{color:#c7c7cc;}
-        .token-status{
-            font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:20px;
-            white-space:nowrap;
-        }
-        .token-status.connected{background:#e8f5e9;color:#2e7d32;}
-        .token-status.disconnected{background:#fce4ec;color:#c62828;}
-        .token-save-btn{
-            padding:8px 18px;border:none;border-radius:8px;
-            background:#0071e3;color:#fff;font-size:.82rem;font-weight:600;
-            font-family:inherit;cursor:pointer;transition:background .15s;white-space:nowrap;
-        }
-        .token-save-btn:hover{background:#0077ed;}
-
-        /* ── Main Content ── */
-        .main{max-width:1200px;margin:0 auto;padding:40px 32px 80px;}
-
-        .section-title{
-            font-size:.72rem;font-weight:600;color:#6e6e73;letter-spacing:.06em;
-            text-transform:uppercase;margin-bottom:16px;
-        }
-
-        /* ── Sitemap Grid ── */
-        .sitemap-grid{
-            display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;
-        }
-        .sitemap-card{
-            background:#fff;border-radius:12px;padding:20px 22px;
-            border:1px solid #e5e5e7;cursor:pointer;
-            transition:all .2s;position:relative;overflow:hidden;
-        }
-        .sitemap-card:hover{
-            border-color:#0071e3;box-shadow:0 2px 12px rgba(0,113,227,.1);
-            transform:translateY(-1px);
-        }
-        .sitemap-card .card-id{
-            font-size:.68rem;font-weight:600;color:#c7c7cc;margin-bottom:6px;
-        }
-        .sitemap-card .card-title{
-            font-size:.95rem;font-weight:700;color:#1d1d1f;margin-bottom:4px;
-        }
-        .sitemap-card .card-desc{
-            font-size:.78rem;color:#8e8e93;line-height:1.45;
-        }
-        .sitemap-card .card-tags{
-            display:flex;gap:4px;margin-top:12px;flex-wrap:wrap;
-        }
-        .sitemap-card .card-tag{
-            font-size:.68rem;font-weight:500;padding:2px 8px;border-radius:4px;
-            background:#f5f5f7;color:#6e6e73;
-        }
-        .sitemap-card .card-preview-hint{
-            position:absolute;top:16px;right:16px;
-            display:flex;gap:4px;
-        }
-        .preview-icon{
-            width:22px;height:16px;border-radius:3px;border:1.5px solid #d1d1d6;
-            display:flex;align-items:center;justify-content:center;
-            font-size:7px;font-weight:700;color:#8e8e93;
-        }
-        .preview-icon.mobile{width:12px;}
-
-        /* ── Preview Modal ── */
-        .preview-overlay{
-            position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
-            z-index:200;display:none;align-items:flex-start;justify-content:center;
-            padding:20px;overflow-y:auto;
-        }
-        .preview-overlay.show{display:flex;}
-        .preview-container{
-            background:#1d1d1f;border-radius:16px;overflow:hidden;
-            width:100%;max-width:calc(375px + 1920px * 0.55 + 48px);
-            box-shadow:0 20px 60px rgba(0,0,0,.4);
-        }
-        .preview-header{
-            padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+            height:36px;
             background:#2d2d2f;
+            display:flex;align-items:center;
+            padding:0 16px;gap:12px;
+            border-bottom:1px solid #3a3a3c;
         }
-        .preview-title{color:#fff;font-size:.88rem;font-weight:600;}
-        .preview-close{
-            width:28px;height:28px;border-radius:50%;border:none;
-            background:#3a3a3c;color:#fff;font-size:1rem;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;
-            transition:background .15s;
+        .gnb-logo{
+            font-size:.78rem;font-weight:700;color:#fff;
+            display:flex;align-items:center;gap:5px;
+            margin-right:8px;white-space:nowrap;
         }
-        .preview-close:hover{background:#48484a;}
-        .preview-body{
-            display:flex;gap:16px;padding:16px;align-items:flex-start;
-            overflow-x:auto;
+        .gnb-logo .dot{width:6px;height:6px;border-radius:50%;background:#0071e3;}
+        .gnb-divider{width:1px;height:16px;background:#48484a;margin:0 2px;}
+
+        /* ── Page Tabs ── */
+        .gnb-tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;}
+        .gnb-tabs::-webkit-scrollbar{display:none;}
+        .gnb-tab{
+            padding:4px 12px;border-radius:4px;font-size:.72rem;font-weight:500;
+            color:#8e8e93;cursor:pointer;transition:all .12s;white-space:nowrap;
+            border:none;background:none;font-family:inherit;
         }
-        .preview-frame-wrap{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
-        .preview-frame-label{
-            color:#8e8e93;font-size:.72rem;font-weight:600;
-            display:flex;align-items:center;gap:6px;
+        .gnb-tab:hover{color:#fff;background:rgba(255,255,255,.08);}
+        .gnb-tab.active{color:#fff;background:#0071e3;}
+
+        /* ── Config Area (right side of GNB) ── */
+        .gnb-config{
+            display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;
         }
-        .preview-frame-label .size{color:#48484a;font-weight:400;}
-        .preview-frame{
-            border:1px solid #3a3a3c;border-radius:8px;overflow:hidden;
-            background:#fff;
+        .gnb-config label{font-size:.65rem;color:#6e6e73;font-weight:500;}
+        .gnb-input{
+            padding:3px 8px;border:1px solid #48484a;border-radius:4px;
+            font-size:.7rem;font-family:inherit;background:#3a3a3c;color:#fff;
+            outline:none;transition:border-color .15s;
         }
-        .preview-frame iframe{border:none;display:block;}
-        .preview-mobile{width:375px;}
-        .preview-mobile iframe{width:375px;height:812px;}
-        .preview-desktop{width:calc(1920px * 0.55);}
-        .preview-desktop iframe{width:1920px;height:1080px;transform:scale(0.55);transform-origin:top left;}
+        .gnb-input:focus{border-color:#0071e3;}
+        .gnb-input::placeholder{color:#636366;}
+        .gnb-input.token{width:180px;}
+        .gnb-input.storeid{width:140px;}
+        .gnb-save{
+            padding:3px 10px;border:none;border-radius:4px;
+            background:#0071e3;color:#fff;font-size:.65rem;font-weight:600;
+            font-family:inherit;cursor:pointer;transition:background .12s;
+        }
+        .gnb-save:hover{background:#0077ed;}
+        .gnb-status{
+            font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:10px;
+        }
+        .gnb-status.on{background:#2e7d32;color:#fff;}
+        .gnb-status.off{background:#c62828;color:#fff;}
+
+        /* ── Content Area ── */
+        .content{
+            height:calc(100vh - 36px);
+            display:flex;
+        }
+
+        /* ── Split Panels ── */
+        .panel{
+            flex:1;display:flex;flex-direction:column;overflow:hidden;
+            border-right:1px solid #3a3a3c;
+        }
+        .panel:last-child{border-right:none;}
+        .panel-label{
+            height:22px;background:#2d2d2f;
+            display:flex;align-items:center;padding:0 12px;
+            font-size:.65rem;font-weight:600;color:#8e8e93;gap:6px;
+            border-bottom:1px solid #3a3a3c;
+        }
+        .panel-label .size{color:#48484a;font-weight:400;}
+        .panel-frame{
+            flex:1;background:#fff;overflow:hidden;position:relative;
+        }
+        .panel-frame iframe{
+            border:none;display:block;
+            width:100%;height:100%;
+        }
+        .panel-mobile .panel-frame iframe{
+            width:375px;height:100%;
+            position:absolute;left:50%;top:0;
+            transform:translateX(-50%);
+        }
+        .panel-desktop .panel-frame iframe{
+            width:1920px;height:100%;
+            transform-origin:top left;
+        }
 
         /* ── Empty State ── */
         .empty-state{
-            text-align:center;padding:80px 20px;color:#8e8e93;
+            flex:1;display:flex;align-items:center;justify-content:center;
+            color:#48484a;font-size:.82rem;
         }
-        .empty-state .icon{font-size:2.5rem;margin-bottom:12px;opacity:.5;}
-        .empty-state p{font-size:.88rem;line-height:1.5;}
     </style>
 </head>
 <body>
 
 <!-- ── GNB ── -->
 <nav class="gnb">
-    <div class="gnb-logo">
-        <span class="dot"></span>
-        Store Vendys
-    </div>
-    <div class="gnb-nav">
-        <a href="#" class="active">Sitemap</a>
+    <div class="gnb-logo"><span class="dot"></span>Store Vendys</div>
+    <div class="gnb-divider"></div>
+    <div class="gnb-tabs" id="gnbTabs"></div>
+    <div class="gnb-divider"></div>
+    <div class="gnb-config">
+        <label>Token</label>
+        <input type="text" class="gnb-input token" id="tokenInput" placeholder="Bearer token...">
+        <label>SID</label>
+        <input type="text" class="gnb-input storeid" id="storeIdInput" placeholder="Store UUID...">
+        <button class="gnb-save" onclick="saveConfig()">Save</button>
+        <span class="gnb-status off" id="tokenStatus">OFF</span>
     </div>
 </nav>
 
-<!-- ── Config Bar ── -->
-<div class="token-bar">
-    <label>API Token</label>
-    <input type="text" class="token-input" id="tokenInput" placeholder="Bearer token을 입력하세요...">
-    <label>Store ID</label>
-    <input type="text" class="token-input" id="storeIdInput" placeholder="UUID (예: 46DE71D7-8F6D-...)" style="max-width:340px;">
-    <span class="token-status disconnected" id="tokenStatus">Disconnected</span>
-    <button class="token-save-btn" onclick="saveConfig()">Save</button>
-</div>
-
-<!-- ── Main ── -->
-<div class="main">
-    <div class="section-title">Sitemap</div>
-    <div class="sitemap-grid" id="sitemapGrid"></div>
-</div>
-
-<!-- ── Preview Modal ── -->
-<div class="preview-overlay" id="previewOverlay" onclick="closePreview(event)">
-    <div class="preview-container" onclick="event.stopPropagation()">
-        <div class="preview-header">
-            <span class="preview-title" id="previewTitle">Page Preview</span>
-            <button class="preview-close" onclick="closePreview()">&times;</button>
-        </div>
-        <div class="preview-body">
-            <div class="preview-frame-wrap preview-mobile">
-                <div class="preview-frame-label">
-                    Mobile <span class="size">375 &times; 812</span>
-                </div>
-                <div class="preview-frame">
-                    <iframe id="mobileFrame"></iframe>
-                </div>
-            </div>
-            <div class="preview-frame-wrap preview-desktop">
-                <div class="preview-frame-label">
-                    Desktop <span class="size">1920 &times; 1080</span>
-                </div>
-                <div class="preview-frame">
-                    <iframe id="desktopFrame"></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- ── Content ── -->
+<div class="content" id="content">
+    <div class="empty-state" id="emptyState">GNB에서 페이지를 선택하세요</div>
 </div>
 
 <script>
     // ── Page Registry ──
     const pages = [
-        { id: 'P-001', title: '매출현황', desc: '쿠폰 사용 매출 현황 조회 (일자별)', tags: ['매출', '쿠폰', 'API'], path: 'pages/sales.html' },
+        { id: 'P-001', title: '매출현황', path: 'pages/sales.html' },
     ];
 
-    // ── Render Sitemap ──
-    function renderSitemap() {
-        const grid = document.getElementById('sitemapGrid');
-        grid.innerHTML = '';
+    let activePage = null;
 
-        if (pages.length === 0) {
-            grid.innerHTML = `
-                <div class="empty-state" style="grid-column:1/-1;">
-                    <div class="icon">&#128466;</div>
-                    <p>아직 등록된 페이지가 없습니다.<br>pages 배열에 페이지를 추가하세요.</p>
-                </div>`;
-            return;
-        }
-
+    // ── Render GNB Tabs ──
+    function renderTabs() {
+        const wrap = document.getElementById('gnbTabs');
+        wrap.innerHTML = '';
         pages.forEach(page => {
-            const card = document.createElement('div');
-            card.className = 'sitemap-card';
-            card.onclick = () => openPreview(page);
-            card.innerHTML = `
-                <div class="card-preview-hint">
-                    <div class="preview-icon mobile">M</div>
-                    <div class="preview-icon">D</div>
-                </div>
-                <div class="card-id">${page.id}</div>
-                <div class="card-title">${page.title}</div>
-                <div class="card-desc">${page.desc}</div>
-                <div class="card-tags">
-                    ${page.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
-                </div>`;
-            grid.appendChild(card);
+            const btn = document.createElement('button');
+            btn.className = 'gnb-tab';
+            btn.textContent = page.title;
+            btn.dataset.id = page.id;
+            btn.onclick = () => selectPage(page);
+            wrap.appendChild(btn);
         });
     }
 
-    // ── Preview ──
-    function openPreview(page) {
-        document.getElementById('previewTitle').textContent = `${page.id} - ${page.title}`;
-        document.getElementById('mobileFrame').src = page.path;
-        document.getElementById('desktopFrame').src = page.path;
-        document.getElementById('previewOverlay').classList.add('show');
-        document.body.style.overflow = 'hidden';
+    // ── Select Page → split view ──
+    function selectPage(page) {
+        activePage = page.id;
+
+        // highlight tab
+        document.querySelectorAll('.gnb-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.id === page.id);
+        });
+
+        const content = document.getElementById('content');
+        content.innerHTML = `
+            <div class="panel panel-mobile">
+                <div class="panel-label">Mobile <span class="size">375px</span></div>
+                <div class="panel-frame">
+                    <iframe src="${page.path}" id="mobileFrame"></iframe>
+                </div>
+            </div>
+            <div class="panel panel-desktop">
+                <div class="panel-label">Desktop <span class="size">1920px</span></div>
+                <div class="panel-frame">
+                    <iframe src="${page.path}" id="desktopFrame"></iframe>
+                </div>
+            </div>
+        `;
+
+        adjustDesktopScale();
     }
 
-    function closePreview(e) {
-        if (e && e.target !== e.currentTarget) return;
-        document.getElementById('previewOverlay').classList.remove('show');
-        document.getElementById('mobileFrame').src = '';
-        document.getElementById('desktopFrame').src = '';
-        document.body.style.overflow = '';
+    // ── Scale desktop iframe to fit panel ──
+    function adjustDesktopScale() {
+        const panel = document.querySelector('.panel-desktop .panel-frame');
+        const iframe = document.getElementById('desktopFrame');
+        if (!panel || !iframe) return;
+        const scale = panel.offsetWidth / 1920;
+        iframe.style.transform = `scale(${scale})`;
+        iframe.style.height = (panel.offsetHeight / scale) + 'px';
     }
 
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closePreview();
+    window.addEventListener('resize', () => {
+        if (activePage) adjustDesktopScale();
     });
 
     // ── Config ──
@@ -283,13 +205,13 @@
         else localStorage.removeItem('sv_token');
         if (storeId) localStorage.setItem('sv_store_id', storeId);
         else localStorage.removeItem('sv_store_id');
-        updateTokenStatus(!!token && !!storeId);
+        updateStatus(!!token && !!storeId);
     }
 
-    function updateTokenStatus(connected) {
+    function updateStatus(ok) {
         const el = document.getElementById('tokenStatus');
-        el.textContent = connected ? 'Connected' : 'Disconnected';
-        el.className = 'token-status ' + (connected ? 'connected' : 'disconnected');
+        el.textContent = ok ? 'ON' : 'OFF';
+        el.className = 'gnb-status ' + (ok ? 'on' : 'off');
     }
 
     // ── Init ──
@@ -298,8 +220,8 @@
         const storeId = localStorage.getItem('sv_store_id');
         if (token) document.getElementById('tokenInput').value = token;
         if (storeId) document.getElementById('storeIdInput').value = storeId;
-        updateTokenStatus(!!token && !!storeId);
-        renderSitemap();
+        updateStatus(!!token && !!storeId);
+        renderTabs();
     })();
 </script>
 </body>
