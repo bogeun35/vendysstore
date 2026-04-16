@@ -165,17 +165,18 @@
         });
 
         const content = document.getElementById('content');
+        const cacheBust = `?v=${Date.now()}`;
         content.innerHTML = `
             <div class="panel panel-mobile">
                 <div class="panel-label">Mobile <span class="size">375px</span></div>
                 <div class="panel-frame">
-                    <iframe src="${page.path}" id="mobileFrame"></iframe>
+                    <iframe src="${page.path}${cacheBust}" id="mobileFrame"></iframe>
                 </div>
             </div>
             <div class="panel panel-desktop">
                 <div class="panel-label">Desktop <span class="size">1920px</span></div>
                 <div class="panel-frame">
-                    <iframe src="${page.path}" id="desktopFrame"></iframe>
+                    <iframe src="${page.path}${cacheBust}" id="desktopFrame"></iframe>
                 </div>
             </div>
         `;
