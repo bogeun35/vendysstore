@@ -16,32 +16,48 @@
 
         /* ── GNB ── */
         .gnb{
-            height:36px;
-            background:#2d2d2f;
+            height:36px;background:#2d2d2f;
             display:flex;align-items:center;
-            padding:0 16px;gap:12px;
+            padding:0 16px;gap:0;
             border-bottom:1px solid #3a3a3c;
+            position:relative;z-index:50;
         }
         .gnb-logo{
             font-size:.78rem;font-weight:700;color:#fff;
             display:flex;align-items:center;gap:5px;
-            margin-right:8px;white-space:nowrap;
+            margin-right:12px;white-space:nowrap;
         }
         .gnb-logo .dot{width:6px;height:6px;border-radius:50%;background:#0071e3;}
-        .gnb-divider{width:1px;height:16px;background:#48484a;margin:0 2px;}
+        .gnb-divider{width:1px;height:16px;background:#48484a;margin:0 6px;}
 
-        /* ── Page Tabs ── */
-        .gnb-tabs{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;}
-        .gnb-tabs::-webkit-scrollbar{display:none;}
-        .gnb-tab{
-            padding:4px 12px;border-radius:4px;font-size:.72rem;font-weight:500;
-            color:#8e8e93;cursor:pointer;transition:all .12s;white-space:nowrap;
-            border:none;background:none;font-family:inherit;
+        /* ── Category Menu ── */
+        .gnb-menus{display:flex;gap:1px;flex:1;min-width:0;}
+        .menu-group{position:relative;}
+        .menu-trigger{
+            padding:4px 10px;border-radius:4px;font-size:.72rem;font-weight:500;
+            color:#8e8e93;cursor:pointer;border:none;background:none;
+            font-family:inherit;white-space:nowrap;transition:all .12s;
+            display:flex;align-items:center;gap:3px;
         }
-        .gnb-tab:hover{color:#fff;background:rgba(255,255,255,.08);}
-        .gnb-tab.active{color:#fff;background:#0071e3;}
+        .menu-trigger:hover,.menu-trigger.open{color:#fff;background:rgba(255,255,255,.08);}
+        .menu-trigger.has-active{color:#0071e3;}
+        .menu-trigger .arrow{font-size:.55rem;opacity:.5;}
+        .menu-dropdown{
+            display:none;position:absolute;top:100%;left:0;
+            background:#2d2d2f;border:1px solid #48484a;border-radius:6px;
+            padding:4px 0;min-width:130px;margin-top:4px;
+            box-shadow:0 8px 24px rgba(0,0,0,.4);
+        }
+        .menu-dropdown.show{display:block;}
+        .menu-item{
+            display:block;width:100%;padding:6px 14px;border:none;background:none;
+            font-size:.72rem;font-weight:500;color:#ccc;font-family:inherit;
+            text-align:left;cursor:pointer;transition:all .1s;white-space:nowrap;
+        }
+        .menu-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+        .menu-item.active{color:#0071e3;font-weight:600;}
 
-        /* ── Config Area (right side of GNB) ── */
+        /* ── Config ── */
         .gnb-config{
             display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;
         }
@@ -61,23 +77,15 @@
             font-family:inherit;cursor:pointer;transition:background .12s;
         }
         .gnb-save:hover{background:#0077ed;}
-        .gnb-status{
-            font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:10px;
-        }
+        .gnb-status{font-size:.6rem;font-weight:600;padding:2px 6px;border-radius:10px;}
         .gnb-status.on{background:#2e7d32;color:#fff;}
         .gnb-status.off{background:#c62828;color:#fff;}
 
-        /* ── Content Area ── */
-        .content{
-            height:calc(100vh - 36px);
-            display:flex;
-        }
+        /* ── Content ── */
+        .content{height:calc(100vh - 36px);display:flex;}
 
-        /* ── Split Panels ── */
-        .panel{
-            display:flex;flex-direction:column;overflow:hidden;
-            border-right:1px solid #3a3a3c;
-        }
+        /* ── Panels ── */
+        .panel{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #3a3a3c;}
         .panel:last-child{border-right:none;}
         .panel-mobile{width:375px;flex-shrink:0;}
         .panel-desktop{flex:1;min-width:0;}
@@ -88,35 +96,20 @@
             border-bottom:1px solid #3a3a3c;
         }
         .panel-label .size{color:#48484a;font-weight:400;}
-        .panel-frame{
-            flex:1;background:#fff;overflow:hidden;position:relative;
-        }
-        .panel-frame iframe{
-            border:none;display:block;
-            height:100%;
-        }
-        .panel-mobile .panel-frame iframe{
-            width:375px;
-        }
-        .panel-desktop .panel-frame iframe{
-            width:1920px;height:100%;
-            transform-origin:top left;
-        }
+        .panel-frame{flex:1;background:#fff;overflow:hidden;position:relative;}
+        .panel-frame iframe{border:none;display:block;height:100%;}
+        .panel-mobile .panel-frame iframe{width:375px;}
+        .panel-desktop .panel-frame iframe{width:1920px;height:100%;transform-origin:top left;}
 
-        /* ── Empty State ── */
-        .empty-state{
-            flex:1;display:flex;align-items:center;justify-content:center;
-            color:#48484a;font-size:.82rem;
-        }
+        .empty-state{flex:1;display:flex;align-items:center;justify-content:center;color:#48484a;font-size:.82rem;}
     </style>
 </head>
 <body>
 
-<!-- ── GNB ── -->
 <nav class="gnb">
     <div class="gnb-logo"><span class="dot"></span>Store Vendys</div>
     <div class="gnb-divider"></div>
-    <div class="gnb-tabs" id="gnbTabs"></div>
+    <div class="gnb-menus" id="gnbMenus"></div>
     <div class="gnb-divider"></div>
     <div class="gnb-config">
         <label>Token</label>
@@ -128,63 +121,111 @@
     </div>
 </nav>
 
-<!-- ── Content ── -->
 <div class="content" id="content">
-    <div class="empty-state" id="emptyState">GNB에서 페이지를 선택하세요</div>
+    <div class="empty-state">메뉴에서 페이지를 선택하세요</div>
 </div>
 
 <script>
-    // ── Page Registry ──
-    const pages = [
-        { id: 'P-001', title: '매출현황', path: 'pages/sales.html' },
+    const menu = [
+        { category: '매출통계', items: [
+            { title: '매출현황', mobile: 'pages/sales.html', desktop: 'pages/sales-web.html' },
+        ]},
+        { category: '매장관리', items: [
+            { title: '메뉴관리', mobile: 'pages/menu.html', desktop: 'pages/menu.html' },
+            { title: '메뉴재고관리', mobile: 'pages/menu-stock.html', desktop: 'pages/menu-stock.html' },
+            { title: '이미지설정', mobile: 'pages/image-setting.html', desktop: 'pages/image-setting.html' },
+            { title: '리뷰관리', mobile: 'pages/review.html', desktop: 'pages/review.html' },
+            { title: '예약관리', mobile: 'pages/reservation.html', desktop: 'pages/reservation.html' },
+            { title: '예약현황', mobile: 'pages/reservation-status.html', desktop: 'pages/reservation-status.html' },
+        ]},
+        { category: '정산', items: [
+            { title: '매출정산', mobile: 'pages/settlement.html', desktop: 'pages/settlement.html' },
+            { title: '증빙내역', mobile: 'pages/receipt.html', desktop: 'pages/receipt.html' },
+        ]},
+        { category: '통계', items: [
+            { title: '매출통계', mobile: 'pages/sales-stats.html', desktop: 'pages/sales-stats.html' },
+            { title: '예약통계', mobile: 'pages/reservation-stats.html', desktop: 'pages/reservation-stats.html' },
+        ]},
+        { category: '설정', items: [
+            { title: '고객사확인', mobile: 'pages/client.html', desktop: 'pages/client.html' },
+            { title: '엑셀보관함', mobile: 'pages/excel-archive.html', desktop: 'pages/excel-archive.html' },
+            { title: '직원관리', mobile: 'pages/staff.html', desktop: 'pages/staff.html' },
+        ]},
     ];
 
-    let activePage = null;
+    let activeItem = null;
+    let openDropdown = null;
 
-    // ── Render GNB Tabs ──
-    function renderTabs() {
-        const wrap = document.getElementById('gnbTabs');
+    function renderMenus() {
+        const wrap = document.getElementById('gnbMenus');
         wrap.innerHTML = '';
-        pages.forEach(page => {
-            const btn = document.createElement('button');
-            btn.className = 'gnb-tab';
-            btn.textContent = page.title;
-            btn.dataset.id = page.id;
-            btn.onclick = () => selectPage(page);
-            wrap.appendChild(btn);
+        menu.forEach((group, gi) => {
+            const div = document.createElement('div');
+            div.className = 'menu-group';
+            const trigger = document.createElement('button');
+            trigger.className = 'menu-trigger';
+            trigger.innerHTML = `${group.category} <span class="arrow">▼</span>`;
+            trigger.onclick = (e) => { e.stopPropagation(); toggleDropdown(gi); };
+
+            const dropdown = document.createElement('div');
+            dropdown.className = 'menu-dropdown';
+            dropdown.id = `dropdown-${gi}`;
+            group.items.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'menu-item';
+                btn.textContent = item.title;
+                btn.dataset.path = item.path;
+                btn.onclick = (e) => { e.stopPropagation(); selectPage(item, btn, trigger); };
+                dropdown.appendChild(btn);
+            });
+
+            div.appendChild(trigger);
+            div.appendChild(dropdown);
+            wrap.appendChild(div);
         });
     }
 
-    // ── Select Page → split view ──
-    function selectPage(page) {
-        activePage = page.id;
+    function toggleDropdown(idx) {
+        const dd = document.getElementById(`dropdown-${idx}`);
+        const isOpen = dd.classList.contains('show');
+        closeAllDropdowns();
+        if (!isOpen) {
+            dd.classList.add('show');
+            dd.closest('.menu-group').querySelector('.menu-trigger').classList.add('open');
+            openDropdown = idx;
+        }
+    }
 
-        // highlight tab
-        document.querySelectorAll('.gnb-tab').forEach(t => {
-            t.classList.toggle('active', t.dataset.id === page.id);
-        });
+    function closeAllDropdowns() {
+        document.querySelectorAll('.menu-dropdown').forEach(d => d.classList.remove('show'));
+        document.querySelectorAll('.menu-trigger').forEach(t => t.classList.remove('open'));
+        openDropdown = null;
+    }
+
+    document.addEventListener('click', closeAllDropdowns);
+
+    function selectPage(item, btn, trigger) {
+        closeAllDropdowns();
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.menu-trigger').forEach(t => t.classList.remove('has-active'));
+        btn.classList.add('active');
+        trigger.classList.add('has-active');
+        activeItem = item.path;
 
         const content = document.getElementById('content');
-        const cacheBust = `?v=${Date.now()}`;
+        const cb = `?v=${Date.now()}`;
         content.innerHTML = `
             <div class="panel panel-mobile">
                 <div class="panel-label">Mobile <span class="size">375px</span></div>
-                <div class="panel-frame">
-                    <iframe src="${page.path}${cacheBust}" id="mobileFrame"></iframe>
-                </div>
+                <div class="panel-frame"><iframe src="${item.mobile}${cb}" id="mobileFrame"></iframe></div>
             </div>
             <div class="panel panel-desktop">
                 <div class="panel-label">Desktop <span class="size">1920px</span></div>
-                <div class="panel-frame">
-                    <iframe src="${page.path}${cacheBust}" id="desktopFrame"></iframe>
-                </div>
-            </div>
-        `;
-
-        adjustDesktopScale();
+                <div class="panel-frame"><iframe src="${item.desktop}${cb}" id="desktopFrame"></iframe></div>
+            </div>`;
+        setTimeout(adjustDesktopScale, 50);
     }
 
-    // ── Scale desktop iframe to fit panel ──
     function adjustDesktopScale() {
         const panel = document.querySelector('.panel-desktop .panel-frame');
         const iframe = document.getElementById('desktopFrame');
@@ -194,18 +235,13 @@
         iframe.style.height = (panel.offsetHeight / scale) + 'px';
     }
 
-    window.addEventListener('resize', () => {
-        if (activePage) adjustDesktopScale();
-    });
+    window.addEventListener('resize', () => { if (activeItem) adjustDesktopScale(); });
 
-    // ── Config ──
     function saveConfig() {
         const token = document.getElementById('tokenInput').value.trim();
         const storeId = document.getElementById('storeIdInput').value.trim();
-        if (token) localStorage.setItem('sv_token', token);
-        else localStorage.removeItem('sv_token');
-        if (storeId) localStorage.setItem('sv_store_id', storeId);
-        else localStorage.removeItem('sv_store_id');
+        if (token) localStorage.setItem('sv_token', token); else localStorage.removeItem('sv_token');
+        if (storeId) localStorage.setItem('sv_store_id', storeId); else localStorage.removeItem('sv_store_id');
         updateStatus(!!token && !!storeId);
     }
 
@@ -215,14 +251,13 @@
         el.className = 'gnb-status ' + (ok ? 'on' : 'off');
     }
 
-    // ── Init ──
     (function init() {
         const token = localStorage.getItem('sv_token');
         const storeId = localStorage.getItem('sv_store_id');
         if (token) document.getElementById('tokenInput').value = token;
         if (storeId) document.getElementById('storeIdInput').value = storeId;
         updateStatus(!!token && !!storeId);
-        renderTabs();
+        renderMenus();
     })();
 </script>
 </body>

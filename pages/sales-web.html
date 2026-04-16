@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매출현황</title>
+    <style>
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-SemiBold.woff') format('woff');font-weight:600;}
+        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');font-weight:700;}
+
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;min-height:100vh;color:#1d1d1f;}
+
+        .page-header{
+            background:#fff;border-bottom:1px solid #e5e5e7;
+            padding:14px 32px;display:flex;align-items:center;justify-content:space-between;
+        }
+        .page-title{font-size:1.05rem;font-weight:700;}
+        .header-right{display:flex;align-items:center;gap:8px;}
+        .date-nav{display:flex;align-items:center;gap:4px;}
+        .date-arrow{
+            width:30px;height:30px;border:1px solid #e5e5e7;border-radius:6px;
+            background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+            font-size:.8rem;transition:background .12s;
+        }
+        .date-arrow:hover{background:#f5f5f7;}
+        .date-input{
+            padding:6px 12px;border:1.5px solid #e5e5e7;border-radius:6px;
+            font-size:.85rem;font-family:inherit;background:#fff;
+        }
+        .date-input:focus{outline:none;border-color:#0071e3;}
+        .search-btn{
+            padding:6px 18px;border:none;border-radius:6px;
+            background:#0071e3;color:#fff;font-size:.82rem;font-weight:600;
+            font-family:inherit;cursor:pointer;transition:background .12s;
+        }
+        .search-btn:hover{background:#0077ed;}
+
+        .summary-row{
+            display:flex;gap:12px;padding:16px 32px;
+        }
+        .summary-card{
+            background:#fff;border-radius:8px;padding:14px 20px;
+            border:1px solid #e5e5e7;flex:1;
+        }
+        .summary-card .label{font-size:.72rem;font-weight:500;color:#8e8e93;margin-bottom:2px;}
+        .summary-card .value{font-size:1.2rem;font-weight:700;}
+        .summary-card .value.blue{color:#0071e3;}
+        .summary-card .value.green{color:#2e7d32;}
+        .summary-card .value.red{color:#c62828;}
+
+        .table-wrap{padding:0 32px 40px;}
+        .table-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+        .table-count{font-size:.78rem;color:#8e8e93;font-weight:500;}
+        .table-page{display:flex;align-items:center;gap:3px;}
+        .page-btn{
+            min-width:28px;height:28px;border:1px solid #e5e5e7;border-radius:5px;
+            background:#fff;font-size:.75rem;font-weight:600;cursor:pointer;
+            display:flex;align-items:center;justify-content:center;
+            transition:all .12s;color:#6e6e73;padding:0 6px;
+        }
+        .page-btn:hover{background:#f5f5f7;}
+        .page-btn.active{background:#1d1d1f;color:#fff;border-color:#1d1d1f;}
+        .page-btn:disabled{opacity:.3;cursor:default;}
+
+        table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e5e7;}
+        thead{background:#f9fafb;}
+        th{padding:9px 14px;text-align:left;font-size:.72rem;font-weight:600;color:#8e8e93;border-bottom:1px solid #e5e5e7;white-space:nowrap;}
+        td{padding:8px 14px;font-size:.8rem;border-bottom:1px solid #f0f1f3;}
+        tbody tr:hover{background:#fafbfc;}
+        .text-right{text-align:right;}
+        .text-center{text-align:center;}
+        .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:600;}
+        .tag-single{background:#e3f2fd;color:#1565c0;}
+        .tag-group{background:#f3e5f5;color:#7b1fa2;}
+        .tag-cancel{background:#fce4ec;color:#c62828;}
+        .tag-done{background:#e8f5e9;color:#2e7d32;}
+        .leader-name{font-weight:600;}
+        .sub-text{font-size:.72rem;color:#8e8e93;}
+        .menu-name{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+        .state-msg{text-align:center;padding:60px 20px;color:#8e8e93;font-size:.88rem;}
+        .state-msg.error{color:#c62828;}
+        .spinner{
+            width:28px;height:28px;border:3px solid #e5e5e7;border-top-color:#0071e3;
+            border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 10px;
+        }
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="page-title">매출현황</div>
+    <div class="header-right">
+        <div class="date-nav">
+            <button class="date-arrow" onclick="shiftDate(-1)">&larr;</button>
+            <input type="date" class="date-input" id="dateInput" onchange="fetchData(1)">
+            <button class="date-arrow" onclick="shiftDate(1)">&rarr;</button>
+        </div>
+        <button class="search-btn" onclick="fetchData(1)">조회</button>
+    </div>
+</div>
+
+<div class="summary-row" id="summaryRow" style="display:none;">
+    <div class="summary-card"><div class="label">총 건수</div><div class="value blue" id="sumTotal">0</div></div>
+    <div class="summary-card"><div class="label">총 공급가</div><div class="value" id="sumSupply">0</div></div>
+    <div class="summary-card"><div class="label">사용 완료</div><div class="value green" id="sumUsed">0</div></div>
+    <div class="summary-card"><div class="label">취소</div><div class="value red" id="sumCancel">0</div></div>
+</div>
+
+<div class="table-wrap">
+    <div id="statusArea"><div class="state-msg">날짜를 선택하고 조회하세요.</div></div>
+    <div id="tableArea" style="display:none;">
+        <div class="table-info">
+            <span class="table-count" id="tableCount"></span>
+            <div class="table-page" id="pagination"></div>
+        </div>
+        <table>
+            <thead><tr>
+                <th class="text-center" style="width:40px">#</th>
+                <th>주문자</th>
+                <th>메뉴</th>
+                <th>매장</th>
+                <th class="text-center">인원</th>
+                <th class="text-right">공급가</th>
+                <th class="text-center">유형</th>
+                <th class="text-center">상태</th>
+                <th>사용일시</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+        </table>
+        <div class="table-info" style="margin-top:8px;">
+            <span></span>
+            <div class="table-page" id="paginationBottom"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'https://store-api.sikdae.com/v1/store/coupon/group';
+    const PAGE_ROW = 100;
+    let currentPage = 1, totalCount = 0;
+
+    function getConfig() {
+        return { token: localStorage.getItem('sv_token') || '', storeId: localStorage.getItem('sv_store_id') || '' };
+    }
+
+    function today() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function shiftDate(offset) {
+        const input = document.getElementById('dateInput');
+        const [y,m,d] = input.value.split('-').map(Number);
+        const dt = new Date(y, m-1, d+offset);
+        input.value = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+        fetchData(1);
+    }
+
+    function formatTime(ts) {
+        if (!ts) return '-';
+        const d = new Date(ts * 1000);
+        return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    function formatNum(n) { return (n||0).toLocaleString('ko-KR'); }
+
+    async function fetchData(page) {
+        const { token, storeId } = getConfig();
+        if (!token || !storeId) { showMsg('Token / Store ID를 설정해주세요.', true); return; }
+
+        currentPage = page || 1;
+        const date = document.getElementById('dateInput').value;
+        if (!date) { showMsg('날짜를 선택해주세요.', true); return; }
+
+        showMsg('<div class="spinner"></div>불러오는 중...');
+
+        try {
+            const url = `${API_BASE}?sid=${storeId}&date=${date}&page=${currentPage}&pageRow=${PAGE_ROW}`;
+            const res = await fetch(url, {
+                headers: {
+                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+                    'x-store-gsid': storeId,
+                    'x-user-agent': 'Vendys/1.0 {"client": "SikdaeUser", "os": "web", "JsVersion": "2.63.0"}',
+                    'Accept': 'application/json'
+                }
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            if (data.status && data.status < 0) throw new Error(data.message || 'API Error');
+
+            totalCount = data.totalCount || 0;
+            const sales = data.sales || [];
+
+            renderSummary(sales);
+            renderTable(sales);
+            renderPagination();
+
+            document.getElementById('summaryRow').style.display = 'flex';
+            document.getElementById('statusArea').style.display = 'none';
+            document.getElementById('tableArea').style.display = 'block';
+        } catch(e) { showMsg(`조회 실패: ${e.message}`, true); }
+    }
+
+    function renderSummary(sales) {
+        const used = sales.filter(s => !s.isCanceled).length;
+        const canceled = sales.filter(s => s.isCanceled).length;
+        const supply = sales.reduce((sum, s) => sum + (s.supplyPrice||0), 0);
+        document.getElementById('sumTotal').textContent = formatNum(totalCount) + '건';
+        document.getElementById('sumSupply').textContent = formatNum(supply) + '원';
+        document.getElementById('sumUsed').textContent = formatNum(used) + '건';
+        document.getElementById('sumCancel').textContent = formatNum(canceled) + '건';
+    }
+
+    function renderTable(sales) {
+        const tbody = document.getElementById('tbody');
+        tbody.innerHTML = '';
+        sales.forEach((s, idx) => {
+            const seq = (currentPage-1)*PAGE_ROW + idx + 1;
+            const typeTag = s.couponType==='SINGLE' ? '<span class="tag tag-single">단체</span>' : '<span class="tag tag-group">그룹</span>';
+            const statusTag = s.isCanceled ? '<span class="tag tag-cancel">취소</span>' : '<span class="tag tag-done">완료</span>';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-center sub-text">${seq}</td>
+                <td><div class="leader-name">${s.leaderName||'-'}</div><div class="sub-text">${s.comName||''}</div></td>
+                <td><div class="menu-name" title="${s.menuName||''}">${s.menuName||'-'}</div></td>
+                <td><div class="sub-text">${s.storeName||'-'}</div></td>
+                <td class="text-center">${s.member||1}</td>
+                <td class="text-right" style="font-weight:600;">${formatNum(s.supplyPrice)}</td>
+                <td class="text-center">${typeTag}</td>
+                <td class="text-center">${statusTag}</td>
+                <td class="sub-text">${formatTime(s.useDate)}</td>`;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('tableCount').textContent = `총 ${formatNum(totalCount)}건 (${currentPage}/${Math.ceil(totalCount/PAGE_ROW)||1} 페이지)`;
+    }
+
+    function renderPagination() {
+        const tp = Math.ceil(totalCount/PAGE_ROW)||1;
+        let h = `<button class="page-btn" onclick="fetchData(${currentPage-1})" ${currentPage<=1?'disabled':''}>&lt;</button>`;
+        let s = Math.max(1,currentPage-2), e = Math.min(tp,s+4);
+        if(e-s<4) s=Math.max(1,e-4);
+        for(let i=s;i<=e;i++) h+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="fetchData(${i})">${i}</button>`;
+        h+=`<button class="page-btn" onclick="fetchData(${currentPage+1})" ${currentPage>=tp?'disabled':''}>&gt;</button>`;
+        document.getElementById('pagination').innerHTML = h;
+        document.getElementById('paginationBottom').innerHTML = h;
+    }
+
+    function showMsg(html, isErr) {
+        document.getElementById('statusArea').style.display = 'block';
+        document.getElementById('statusArea').innerHTML = `<div class="state-msg ${isErr?'error':''}">${html}</div>`;
+        document.getElementById('tableArea').style.display = 'none';
+        if(isErr) document.getElementById('summaryRow').style.display = 'none';
+    }
+
+    document.getElementById('dateInput').value = today();
+    fetchData(1);
+</script>
+</body>
+</html>
