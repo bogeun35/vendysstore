@@ -208,7 +208,7 @@
             const url = `${API_BASE}?sid=${storeId}&date=${date}&page=${currentPage}&pageRow=${PAGE_ROW}`;
             const res = await fetch(url, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
                     'x-store-gsid': storeId,
                     'x-user-agent': 'Vendys/1.0 {"client": "SikdaeUser", "os": "web", "JsVersion": "2.63.0"}',
                     'Accept': 'application/json'
