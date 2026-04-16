@@ -139,7 +139,7 @@
         <input type="date" class="date-hidden" id="dateInput" onchange="onDateChange()">
     </div>
     <div class="search-bar">
-        <input type="text" class="search-input" id="searchInput" placeholder="결제번호 또는 이름으로 검색..." oninput="filterList()">
+        <input type="text" class="search-input" id="searchInput" placeholder="결제번호 / 메뉴명 검색..." oninput="filterList()">
     </div>
 </div>
 
@@ -265,11 +265,10 @@ function renderList(sales) {
         card.className='sale-card';
         card.dataset.couponId=s.couponId;
         card.dataset.payRoom=s.payRoomIdx||'';
-        card.dataset.leader=(s.leaderName||'').replace(/\*/g,'');
+        card.dataset.menu=(s.menuName||'').toLowerCase();
         card.dataset.hour=s.useDate?new Date(s.useDate*1000).getHours():'';
         card.onclick=()=>openDetail(s.couponId);
-        const statusTag=s.isCanceled?'<span class="sale-tag t-cancel">취소</span>':'<span class="sale-tag t-done">완료</span>';
-        const typeTag=s.couponType==='SINGLE'?'<span class="sale-tag t-single">단체</span>':'<span class="sale-tag t-group">그룹</span>';
+        const statusTag=s.isCanceled?'<span class="sale-tag t-cancel">결제취소</span>':'<span class="sale-tag t-done">결제완료</span>';
         card.innerHTML=`
             <div class="sale-top">
                 <div><div class="sale-leader">${s.leaderName||'-'}</div><div class="sale-company">${s.comName||''}</div></div>
@@ -277,7 +276,7 @@ function renderList(sales) {
             </div>
             <div class="sale-menu">${s.menuName||'-'}</div>
             <div class="sale-bottom">
-                ${statusTag}${typeTag}
+                ${statusTag}
                 <span class="sale-meta">${formatTime(s.useDate)}</span>
                 <span class="sale-payroom">${s.payRoomIdx||'-'}</span>
             </div>`;
@@ -292,10 +291,9 @@ function applyFilters() {
     const q=document.getElementById('searchInput').value.trim().toLowerCase();
     document.querySelectorAll('.sale-card').forEach(card=>{
         const payRoom=(card.dataset.payRoom||'').toLowerCase();
-        const leader=(card.dataset.leader||'').toLowerCase();
-        const text=card.textContent.toLowerCase();
+        const menu=(card.dataset.menu||'');
         const hour=parseInt(card.dataset.hour,10);
-        const matchSearch=!q||payRoom.includes(q)||leader.includes(q)||text.includes(q);
+        const matchSearch=!q||payRoom.includes(q)||menu.includes(q);
         const matchHour=selectedHours.size===0||selectedHours.has(hour);
         card.style.display=(matchSearch&&matchHour)?'':'none';
     });
@@ -313,14 +311,13 @@ async function openDetail(couponId) {
         if(data.status&&data.status<0)throw new Error(data.message);
         const c=data.coupon;
         const menus=data.menus||[];
-        const statusText=c.paymentStatus==='USED'?'사용완료':c.paymentStatus==='CANCELED'?'취소':c.paymentStatus;
+        const statusText=c.paymentStatus==='USED'?'결제완료':c.paymentStatus==='CANCELED'?'결제취소':c.paymentStatus;
         let html=`
             <div class="sheet-title">${c.leaderName||'-'}</div>
             <div class="sheet-sub">${c.comName||''} · ${c.payRoomIdx||'-'}</div>
             <div class="sheet-row"><span class="sheet-label">결제번호</span><span class="sheet-val">${c.payRoomIdx||'-'}</span></div>
             <div class="sheet-row"><span class="sheet-label">쿠폰ID</span><span class="sheet-val" style="font-size:.7rem;">${c.couponId}</span></div>
             <div class="sheet-row"><span class="sheet-label">상태</span><span class="sheet-val">${statusText}</span></div>
-            <div class="sheet-row"><span class="sheet-label">결제유형</span><span class="sheet-val">${c.couponType==='SINGLE'?'단체':'그룹'}</span></div>
             <div class="sheet-row"><span class="sheet-label">결제금액</span><span class="sheet-val" style="font-weight:700;">${formatNum(c.totalSupplyPrice)}원</span></div>
             <div class="sheet-row"><span class="sheet-label">사용일시</span><span class="sheet-val">${formatTime(c.useDate)}</span></div>
             <div class="sheet-row"><span class="sheet-label">등록일시</span><span class="sheet-val">${formatTime(c.regDate)}</span></div>
