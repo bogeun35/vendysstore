@@ -40,22 +40,29 @@
         .summary-card .value{font-size:1.15rem;font-weight:700;}
         .summary-card .value.blue{color:#0071e3;}.summary-card .value.green{color:#2e7d32;}.summary-card .value.red{color:#c62828;}
 
-        .chart-card{background:#fff;border-radius:8px;padding:12px 16px;border:1px solid #e5e5e7;flex:2;display:flex;flex-direction:column;}
-        .chart-title{font-size:.72rem;font-weight:600;color:#8e8e93;margin-bottom:6px;}
-        .chart-bars{display:flex;align-items:flex-end;gap:2px;flex:1;}
-        .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;}
-        .chart-bar-wrap:hover .chart-bar{opacity:.7;}
-        .chart-bar-wrap.active .chart-bar{background:#ff9500!important;}
-        .chart-bar-wrap.active .chart-label{color:#ff9500;font-weight:600;}
-        .chart-bar{width:100%;border-radius:2px 2px 0 0;background:#0071e3;min-height:1px;transition:height .3s;}
-        .chart-bar.zero{background:#e5e5e7;}
-        .chart-label{font-size:.55rem;color:#aeaeb2;}
-        .chart-val{font-size:.5rem;color:#8e8e93;font-weight:500;}
-
-        /* ── Hour Filter Tag ── */
-        .hour-filter-tag{display:none;align-items:center;gap:6px;padding:0 32px 8px;font-size:.75rem;color:#ff9500;font-weight:600;}
-        .hour-filter-tag.show{display:flex;}
-        .hour-filter-clear{border:none;background:#ff9500;color:#fff;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:8px;cursor:pointer;font-family:inherit;}
+        /* ── Hour Buttons (web) ── */
+        .hour-card{background:#fff;border-radius:8px;padding:10px 14px;border:1px solid #e5e5e7;flex:2;display:flex;flex-direction:column;}
+        .hour-card-title{font-size:.72rem;font-weight:600;color:#8e8e93;margin-bottom:6px;}
+        .hour-grid-web{display:flex;flex-wrap:wrap;gap:3px;flex:1;align-content:flex-start;}
+        .hour-btn-web{
+            padding:4px 0;border:1px solid #e5e5e7;border-radius:5px;
+            background:#fff;font-size:.7rem;font-weight:500;color:#3a3a3c;
+            font-family:inherit;cursor:pointer;transition:all .12s;text-align:center;
+            width:calc((100% - 21px) / 8);
+        }
+        .hour-btn-web:hover{background:#f5f5f7;}
+        .hour-btn-web .h-cnt{font-size:.6rem;color:#aeaeb2;}
+        .hour-btn-web.has-data{color:#1d1d1f;border-color:#d1d1d6;}
+        .hour-btn-web.has-data .h-cnt{color:#0071e3;}
+        .hour-btn-web.no-data{opacity:.35;}
+        .hour-btn-web.active{background:#0071e3;color:#fff;border-color:#0071e3;}
+        .hour-btn-web.active .h-cnt{color:rgba(255,255,255,.7);}
+        .hour-all-web{
+            width:100%;padding:3px 0;border:1px solid #e5e5e7;border-radius:5px;
+            background:#f9fafb;font-size:.68rem;font-weight:600;color:#8e8e93;
+            font-family:inherit;cursor:pointer;margin-bottom:4px;
+        }
+        .hour-all-web.active{background:#1d1d1f;color:#fff;border-color:#1d1d1f;}
 
         /* ── Table ── */
         .table-wrap{padding:0 32px 40px;}
@@ -129,15 +136,11 @@
         <div class="summary-card"><div class="label">사용완료</div><div class="value green" id="sumUsed">0</div></div>
         <div class="summary-card"><div class="label">취소</div><div class="value red" id="sumCancel">0</div></div>
     </div>
-    <div class="chart-card">
-        <div class="chart-title">시간별 결제 현황 [<span id="chartCount">0</span>]</div>
-        <div class="chart-bars" id="chartBars"></div>
+    <div class="hour-card">
+        <div class="hour-card-title">시간대 필터 [<span id="chartCount">0</span>건]</div>
+        <button class="hour-all-web active" id="hourAllBtn" onclick="clearHourFilter()">전체</button>
+        <div class="hour-grid-web" id="hourGrid"></div>
     </div>
-</div>
-
-<div class="hour-filter-tag" id="hourFilterTag">
-    <span id="hourFilterText"></span>
-    <button class="hour-filter-clear" onclick="clearHourFilter()">해제</button>
 </div>
 
 <div class="table-wrap">
@@ -207,7 +210,7 @@ async function fetchData(page) {
         if(data.status&&data.status<0)throw new Error(data.message||'API Error');
         totalCount=data.totalCount||0;
         allSales=data.sales||[];
-        renderSummary(); renderChart(); renderTable(); renderPagination();
+        renderSummary(); renderHourButtons(); renderTable(); renderPagination();
         document.getElementById('statsRow').style.display='flex';
         document.getElementById('statusArea').style.display='none';
         document.getElementById('tableArea').style.display='block';
@@ -224,26 +227,22 @@ function renderSummary() {
     document.getElementById('sumCancel').textContent=formatNum(canceled)+'건';
 }
 
-function renderChart() {
+function renderHourButtons() {
     const hours=Array(24).fill(0);
     allSales.forEach(s=>{if(s.useDate){hours[new Date(s.useDate*1000).getHours()]++;}});
-    const max=Math.max(...hours,1);
     document.getElementById('chartCount').textContent=allSales.length;
-    const wrap=document.getElementById('chartBars'); wrap.innerHTML='';
+    const grid=document.getElementById('hourGrid'); grid.innerHTML='';
     hours.forEach((cnt,h)=>{
-        const pct=Math.round((cnt/max)*100);
-        const active=selectedHour===h?'active':'';
-        wrap.innerHTML+=`<div class="chart-bar-wrap ${active}" onclick="toggleHourFilter(${h})"><div class="chart-val">${cnt||''}</div><div class="chart-bar ${cnt===0?'zero':''}" style="height:${Math.max(pct,2)}%"></div><div class="chart-label">${h}</div></div>`;
+        const cls=selectedHour===h?'active':cnt>0?'has-data':'no-data';
+        grid.innerHTML+=`<button class="hour-btn-web ${cls}" onclick="toggleHourFilter(${h})">${h}시 <span class="h-cnt">${cnt}</span></button>`;
     });
+    document.getElementById('hourAllBtn').className='hour-all-web'+(selectedHour<0?' active':'');
 }
 
 function toggleHourFilter(h) {
-    selectedHour=selectedHour===h?-1:h; renderChart(); applyFilters();
-    const tag=document.getElementById('hourFilterTag');
-    if(selectedHour>=0){tag.classList.add('show');document.getElementById('hourFilterText').textContent=`${selectedHour}시 ~ ${selectedHour}:59 필터 적용중`;}
-    else{tag.classList.remove('show');}
+    selectedHour=selectedHour===h?-1:h; renderHourButtons(); applyFilters();
 }
-function clearHourFilter(){ selectedHour=-1; renderChart(); applyFilters(); document.getElementById('hourFilterTag').classList.remove('show'); }
+function clearHourFilter(){ selectedHour=-1; renderHourButtons(); applyFilters(); }
 
 function renderTable() {
     const tbody=document.getElementById('tbody'); tbody.innerHTML='';
