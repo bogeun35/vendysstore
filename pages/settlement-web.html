@@ -2,19 +2,16 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>매출정산</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');font-weight:400;}
-        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Medium.woff') format('woff');font-weight:500;}
-        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-SemiBold.woff') format('woff');font-weight:600;}
-        @font-face{font-family:'Pretendard';src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');font-weight:700;}
 
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;background:#f5f5f7;min-height:100vh;color:#1d1d1f;}
 
-        .page-header{background:#fff;border-bottom:1px solid #e5e5e7;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;}
+        .page-header{background:#fff;border-bottom:1px solid #e5e5e7;padding:12px 3%;display:flex;align-items:center;justify-content:space-between;}
         .page-title{font-size:1.05rem;font-weight:700;}
         .header-right{display:flex;align-items:center;gap:10px;}
         .year-nav{display:flex;align-items:center;gap:4px;}
@@ -26,7 +23,7 @@
         .excel-btn:disabled{opacity:.5;cursor:default;}
 
         /* ── Stats Row ── */
-        .stats-row{display:flex;gap:12px;padding:16px 32px;}
+        .stats-row{display:flex;gap:12px;padding:16px 3%;}
         .summary-cards{display:flex;gap:10px;flex:1;}
         .summary-card{background:#fff;border-radius:8px;padding:12px 18px;border:1px solid #e5e5e7;flex:1;}
         .summary-card .label{font-size:.72rem;font-weight:500;color:#8e8e93;margin-bottom:2px;}
@@ -34,7 +31,7 @@
         .summary-card .value.blue{color:#0071e3;}
 
         /* ── Month Buttons ── */
-        .month-bar{padding:0 32px 12px;display:flex;gap:4px;align-items:center;}
+        .month-bar{padding:0 3% 12px;display:flex;gap:4px;align-items:center;}
         .month-btn{
             padding:5px 12px;border:1px solid #e5e5e7;border-radius:6px;
             background:#fff;font-size:.75rem;font-weight:600;color:#1d1d1f;
@@ -50,7 +47,7 @@
         .month-btn-all.active{background:#1d1d1f;color:#fff;border-color:#1d1d1f;}
 
         /* ── Table ── */
-        .table-wrap{padding:0 32px 40px;}
+        .table-wrap{padding:0 3% 40px;}
         .table-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
         .table-count{font-size:.78rem;color:#8e8e93;font-weight:500;}
 
